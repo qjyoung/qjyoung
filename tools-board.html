@@ -13,7 +13,7 @@
         a{ text-decoration: none;}
 </style>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-    
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
 </head>
 <body>
 <div id="app" style="width:100%;height: 100%;">
@@ -160,7 +160,64 @@
                         {url: '', name: ''},
                         {url: '', name: ''},
                     ]
-                }]
+                }],
+            myCountdown: [{
+                "date_cn": "xxxx年09月16日",
+                "holiday_cn": "生日"
+            }]
+        },
+        mounted() {
+
+            let countdown = {
+                title: "Countdown",
+                background: "FFE56F",
+                tools: []
+            }
+
+            function dayHandler(each) {
+                let day = each.date_cn;
+                let date = new Date();
+                day = day.replace("xxxx", date.getFullYear());
+                day = day.replace("年", "-");
+                day = day.replace("月", "-");
+                day = day.replace("日", "");
+                let dayDate = new Date(day);
+                let diff = (dayDate.getTime() - date.getTime()) / 1000 / 3600 / 24;
+                if (diff < 0) {
+                    return
+                }
+                day = day.substr(day.indexOf("-") + 1);
+                countdown.tools.push({name: day + "\t" + each.holiday_cn + "\t" + parseInt(diff) + "天"})
+            }
+
+            let mine = this.myCountdown;
+            let this0 = this;
+
+            let date = new Date();
+            let url = 'https://api.apihubs.cn/holiday/get?field=date,holiday&year=' + date.getFullYear() + '&holiday_today=1&holiday_legal=1&order_by=1&cn=1&size=31'
+            $.ajax({
+                type: "GET",
+                url: url,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.code === 0) {
+                        data = data.data.list
+                        data.forEach(dayHandler);
+                    }
+
+                    countdown.tools.push({})
+                    let nextYear = date.getFullYear() + 1;
+                    dayHandler({
+                        "date_cn": nextYear + "年01月01日",
+                        "holiday_cn": nextYear + "年"
+                    })
+                    countdown.tools.push({})
+
+                    mine.forEach(dayHandler);
+
+                    this0.toolGroups.push(countdown)
+                }
+            });
         }
     });
 </script>
