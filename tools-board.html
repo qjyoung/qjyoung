@@ -1,224 +1,321 @@
-<html lang="en">​
-​
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>tools-board</title>
     <style>
-        a:link {color: blue}
-        a:visited {color: blue}
-        a:hover {color: blue;text-decoration:underline;}
-        a:active {color: blue}
-        a{ text-decoration: none;}
-</style>
+        a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}
+    </style>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
 </head>
 <body>
 <div id="app" style="width:100%;height: 100%;">
     <tools-board v-bind:tool_groups="toolGroups"></tools-board>
+    <tools-board v-bind:tool_groups="[countdown]"></tools-board>
 </div>
 </body>
 <script>
-    new Vue({
-        el: '#app',
-        components: {
-            toolsBoard: {
-                props: ['tool_groups'],
-                template: '<div>\
-                                <div style="float:left;padding: 5px 17px 5px 17px;margin: 5px 17px 5px 17px" :style="{\'background-color\':group.background}" v-for="group in tool_groups">\
-                                    <h1>{{group.title}}</h1>\
-                                    <ol>\
-                                        <template v-for="tool in group.tools">\
-                                            <li><a :href="tool.url" target="_blank">{{tool.name}}</a></li>\
-                                        </template>\
-                                    </ol>\
-                                </div>\
-                            </div>'
-            }
+  var _hmt = _hmt || [];
+  (function () {
+    let hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?9af9c46c970d24ceed26f5283d61aaf0";
+    let s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(hm, s);
+  })();
+</script>
+
+<script>
+  let type_tool = 1;
+  let type_countdown = 2;
+  let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
+  new Vue({
+    el: '#app',
+    components: {
+      toolsBoard: {
+        props: ['tool_groups'],
+        data() {
+          return {
+            name: "乔健勇",
+            url: "https://qjyoung.github.io",
+            date: "xxxx-10-05",
+            desc: "xxxx==当年"
+          }
         },
-        data: {
-            toolGroups: [
-                {
-                    title: "siyueren",
-                    background: "pink",
-                    tools: [
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: '', name: ''},
-                        {url: 'https://v.qq.com/x/page/n0536o6npn5.html', name: '一个人踩着单车去拉萨'},
-                        {url: '', name: ''},
-                        {url: 'https://mp.weixin.qq.com/s/HARgAEd3G36cMgioiwA04A', name: '西藏，魂归之地'},
-                        {url: 'https://mp.weixin.qq.com/s/X1R4ozZ_QmZZHa_2kCt0KA', name: '受宠若惊，竟被DDoS攻击了'},
-                        {url: 'https://mp.weixin.qq.com/s/gttv67UBfCn-JapSfzHMlA', name: '商城下单-三方支付-时序图'},
-                        {url: 'https://mp.weixin.qq.com/s/ZlK9vPLLkNFP73TPDrth5A', name: '借助lambda灵活控制事物粒度'},
-                        {url: 'https://mp.weixin.qq.com/s/nbzWbws4o53tO42WZMFynA', name: '注解、代理简化redis分布式锁-实现代码'},
-                        {url: 'https://mp.weixin.qq.com/s/ycdvhfzIP6Y_CpskCyrQmQ', name: '通用的区块链智能合约web3.go调用服务'},
-                        {url: 'https://mp.weixin.qq.com/s/KJv8m_1exKeMEU__pGR4Ug', name: 'docker快速搭建elk-2-解析Java、go、nginx日志，让你的日志从一潭死水变成生机勃勃的海洋'},
-                        {url: 'https://mp.weixin.qq.com/s/hoOZqeHwkvwWyP8BhCKP7Q', name: 'Git 多人协作，诸葛亮带你玩转cherry-pick 、rebase'},
-                        {url: 'https://mp.weixin.qq.com/s/ZrDaT1kMT30EDqBLi28lUA', name: '精简版-五颜六色的常用工具面板-基于Vue'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247484055&idx=1&sn=64a917a0c9b348afb0ca706fe6ab072c&chksm=fd7457d7ca03dec170e67bf02b6d61e69ea3d9bf2b1895fc4a4b0cb07872f56cbdc1ead25248&token=163759059&lang=zh_CN#rd', name: 'SQL查看数据 - 借助view、group_concat节省你宝贵时间'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247484019&idx=1&sn=ee5dfc27cd17e3101333541214a1f54e&chksm=fd745733ca03de2571d39cc62570133bc627348c690cb5918a64fe5dfd7f2e86b51bcf035786&token=163759059&lang=zh_CN#rd', name: '用VUE做一个常用工具面板'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483993&idx=1&sn=255ffdd3ca9a512389c71f8f53d9f47c&chksm=fd745719ca03de0f33d1e90756ba21789bb7a43264cb010f67966ba4927a3872be18989a2f19&token=163759059&lang=zh_CN#rd', name: '被工具（Goland）坑的最惨的一次'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483983&idx=1&sn=b3d17e1eddb04ffc57bc9fa5281c8089&chksm=fd74570fca03de190cf8aaf554e5a9c4a800748013fd8a18cc03698c017512c336c19052a414&token=163759059&lang=zh_CN#rd', name: '做一个会偷懒的程序员'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483956&idx=1&sn=5dd53e318dee8601164e2854018572e6&chksm=fd745774ca03de6274a2bb4badf790bf45eed33508943e738ea8751de3fd7553532d71e4b16f&token=163759059&lang=zh_CN#rd', name: 'idea定制groovy脚本，导出db数据到csv自动加行号和标题'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483937&idx=1&sn=4d719be147d43eda2cb222e6a622a637&chksm=fd745761ca03de77cbf817ee04b2b09163b76927ac30793f8626243d50ad433adaeff89439db&token=163759059&lang=zh_CN#rd', name: '60行shell脚本快速生成Java项目脚手架'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483912&idx=1&sn=dc0f0ec6bcd4adb6b6e4213083ea668b&chksm=fd745748ca03de5ea821a4b07ec86b785e92826b2a736c85018576f07d19550374a171eddb33&token=163759059&lang=zh_CN#rd', name: '用docker快速搭建elk日志平台'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483892&idx=1&sn=efed3a27637dfb66fd13e41966669919&chksm=fd7454b4ca03dda2e22c60d6073535c6e24ce7c3ed3adc59c658302137e521ae03a8a09493fb&token=163759059&lang=zh_CN#rd', name: '50行go实现tree命令'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483883&idx=1&sn=79fedccc36d9d438a103b162f6b4aeb2&chksm=fd7454abca03ddbd4712a9eccc6f8ab1b9c5cfabdf35439594b252588bf4f29a2ca67308b533&token=163759059&lang=zh_CN#rd', name: '错怪Mybatis, 原来这并不是bug'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483863&idx=1&sn=855b9e8289fb48b46fe97823be14a0c9&chksm=fd745497ca03dd8113f2aaa6fcebba931a92b8bf08048b720c54fc805ea3897bafd3e2809ae5&token=163759059&lang=zh_CN#rd', name: '注解+代理 加持分布式锁，让代码更简洁'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483834&idx=1&sn=163e85fe1e2483091170e7ced018bfa4&chksm=fd7454faca03ddec72863594874faf7c3a5b90a9f9b312a9be8ee3c286421da739551e149e4b&token=163759059&lang=zh_CN#rd', name: 'DIY插件，自动生成set调用，解放双手'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483807&idx=1&sn=a7b684b1635008a7dd1692a11e7be5bd&chksm=fd7454dfca03ddc9e1cbc723f7c46c8653e31862a1a878abb8af7d24ecb4af7d6041a7aeaa53&token=163759059&lang=zh_CN#rd', name: 'Java回调、Lambda与Redis分布式锁新玩法'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483766&idx=1&sn=a43aa6de6d9942bf4764b931767fa639&chksm=fd745436ca03dd2032c51d4d6d571ba407f73f026f0c39b51ca582117c322fd9352b060cceac&token=163759059&lang=zh_CN#rd', name: '巨烧脑-估计没几人能看懂:实现tree命令 - 探索你D盘的秘密'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483737&idx=1&sn=9c742571e6f74ad099b09b3c784bf1c3&chksm=fd745419ca03dd0fc1bdcd802991022d09a6795bc5e8487cd34551722f3b7a99bf6f0ab43ef3&token=163759059&lang=zh_CN#rd', name: '基于shiro的权限自动录入'},
-                        {url: '', name: ''},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483704&idx=1&sn=b84bd5e2bec00b0111c9536e87475aec&chksm=fd745478ca03dd6ea8bc7b0d928fcbfaac0dffceba85ade5d9c970ba48cb3726e7a0de158085&token=163759059&lang=zh_CN#rd', name: '南天门上，三千忠魂奋孤勇；祭旗坡下，一腔热血照青山'},
-                        {url: '', name: ''},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247484021&idx=1&sn=1852fced623232cf929caa3bf7363d8e&chksm=fd745735ca03de23c664fe8c8a38548694d2282345585ff6817a87a1af51034a37f288363261&token=163759059&lang=zh_CN#rd', name: '2020年5月，比特币即将迎来第三次减半，为什么比特币会减半'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483723&idx=1&sn=53e4b0d400a3fbb2ddfb612f1638a88d&chksm=fd74540bca03dd1db99857a8ef9791588af5a62d93624eab6ec589d049c47d2212c9171b4972&token=163759059&lang=zh_CN#rd', name: '不小心敲了 rm -rf / 后反应是怎样的？'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483717&idx=1&sn=4044aa2abbd160af4164b233c494a902&chksm=fd745405ca03dd13e05252a5e185a43bbec217aca1a34271dcaa5e813b3b516fbafbc7a9bfb5&token=163759059&lang=zh_CN#rd', name: '星际穿越的完全解析'},
-                        {url: 'https://mp.weixin.qq.com/s?__biz=MzU3ODQ1NDU3NQ==&mid=2247483684&idx=1&sn=7ed454eccbfebe1dd22001f6d085873c&chksm=fd745464ca03dd728da8e924dea796d27276676a15a47d0a0fe4177b3551dc71fda241b608db&token=163759059&lang=zh_CN#rd', name: '奇记｜生死荒原路，52天首次单人完整横穿大羌塘'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: '', name: ''},
-                        {url: 'https://github.com/qjyoung', name: 'github'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                    ]
-                },
-                {
-                    title: "docs_chain",
-                    background: "yellow",
-                    tools: [
-                        {url: 'https://eth.btc.com/', name: 'eth-browser'},
-                        {url: 'https://blockchain.info/', name: 'btc-browser'},
-                        {url: '', name: ''},
-                        {url: '', name: 'hoo'},
-                        {url: 'https://hoo.com/trade/btc-usdt', name: 'btc'},
-                        {url: 'https://hoo.com/trade/eth-usdt', name: 'eth'},
-                        {url: '', name: ''},
-                        {url: 'https://www.huobi.me/en-us/markets/', name: 'huobi-home'},
-                        {url: 'https://www.huobi.me/en-us/exchange/btc_usdt/', name: 'btc_usdt'},
-                        {url: 'https://www.huobi.me/en-us/exchange/eth_usdt/', name: 'eth_usdt'},
-                        {url: '', name: ''},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                    ]
-                },
-                {
-                    title: "docs",
-                    background: "cyan",
-                    tools: [
-                        {url: 'http://tools.qjyoung.top/format/index.htm', name: 'Json格式化'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                    ]
-                },
-                {
-                    title: "jenkins",
-                    background: "limegreen",
-                    tools: [
-                        {url: 'https://www.bootcdn.cn/', name: '前端开源项目 CDN '},
-                        {url: 'http://tools.qjyoung.top/encrypt/encrypt2.html', name: '哈希散列'},
-                        {url: 'http://tools.qjyoung.top/json2bean/index.html', name: 'json 2 bean'},
-                        {url: 'http://www.jq22.com/textDifference', name: 'show diff'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: 'https://blog.siyueren.com', name: 'siyueren.com'},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                        {url: '', name: ''},
-                    ]
-                }],
-            myCountdown: [{
-                "date_cn": "xxxx年09月16日",
-                "holiday_cn": "生日"
-            }]
-        },
-        mounted() {
-
-            let countdown = {
-                title: "Countdown",
-                background: "FFE56F",
-                tools: []
-            }
-
-            function dayHandler(each) {
-                let day = each.date_cn;
-                let date = new Date();
-                day = day.replace("xxxx", date.getFullYear());
-                day = day.replace("年", "-");
-                day = day.replace("月", "-");
-                day = day.replace("日", "");
-                let dayDate = new Date(day);
-                let diff = (dayDate.getTime() - date.getTime()) / 1000 / 3600 / 24;
-                if (diff < 0) {
-                    return
-                }
-                day = day.substr(day.indexOf("-") + 1);
-                countdown.tools.push({name: day + "\t" + each.holiday_cn + "\t" + parseInt(diff) + "天"})
-            }
-
-            let mine = this.myCountdown;
-            let this0 = this;
-
-            let date = new Date();
-            let url = 'https://api.apihubs.cn/holiday/get?field=date,holiday&year=' + date.getFullYear() + '&holiday_today=1&holiday_legal=1&order_by=1&cn=1&size=31'
-            $.ajax({
-                type: "GET",
-                url: url,
-                dataType: 'json',
-                success: function (data) {
-                    if (data.code === 0) {
-                        data = data.data.list
-                        data.forEach(dayHandler);
-                    }
-
-                    countdown.tools.push({})
-                    let nextYear = date.getFullYear() + 1;
-                    dayHandler({
-                        "date_cn": nextYear + "年01月01日",
-                        "holiday_cn": nextYear + "年"
-                    })
-                    countdown.tools.push({})
-
-                    mine.forEach(dayHandler);
-
-                    this0.toolGroups.push(countdown)
-                }
+        template: '<div>\
+                        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in tool_groups">\
+                            <h1 v-bind:class="!group.custom?\'\':\'title\'">{{group.title===""?"请输入标题":group.title}}\
+                                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>\
+                            </h1>\
+                            <ol style="margin-bottom: 22px">\
+                                <template v-for="tool in group.tools">\
+                                    <li class="item" style="padding-right: 2px">\
+                                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>\
+                                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="group.tools.splice(group.tools.indexOf(tool),1)">❌</span>\
+                                    </li>\
+                                </template>\
+                            </ol>\
+                            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom||group.type===type_countdown">\
+                                <template  v-if="group.type===type_countdown">\
+                                    <input type="text" style="width: 40%" placeholder="日期" v-model="date"/>\
+                                    <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>\
+                                </template>\
+                                <template  v-else>\
+                                    <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>\
+                                    <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>\
+                                </template>\
+                                <span class="my-button" style="position: absolute;margin-left: 3px"  @click="newItem(group)">✅<span/>\
+                            </div>\
+                            <div class="badge up item-x" v-if="group.custom">\
+                                <span class="my-button" @click="tool_groups.splice(tool_groups.indexOf(group),1)">❌</span>\
+                            </div>\
+                            <div class="badge down item-x" v-if="group.type!==type_countdown">\
+                                <span class="my-button" @click="newGroup(group)">➕</span>\
+                            </div>\
+                        </div>\
+                    </div>',
+        methods: {
+          newGroup(previousGroup) {
+            this.tool_groups.splice(this.tool_groups.indexOf(previousGroup) + 1, 0, {
+              title: "请输入标题",
+              custom: true,
+              background: colors[Math.ceil(Math.random() * colors.length)],
+              tools: []
             });
+          },
+          newItem(group) {
+            let date = '';
+            if (group.type === type_countdown) {
+              let strings = this.date.split('-');
+              let length = strings.length;
+              if (length > 3 || length === 0) {
+                alert("error date");
+                return;
+              }
+              let year = 'xxxx', month = 'xx', day = strings[length - 1];
+              if (length > 1) {
+                month = strings[length - 2];
+              }
+              if (length > 2) {
+                year = strings[length - 3];
+              }
+              if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
+                alert("error year");
+                return;
+              }
+              if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
+                alert("error month")
+                return
+              }
+              if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
+                alert("error day")
+                return
+              }
+              date = [year, month, day].join('-');
+            }
+            group.tools.push({
+              date: date,
+              desc: this.desc,
+              name: this.name || "空",
+              url: this.url,
+              custom: true
+            });
+          },
+        },
+      }
+    },
+    data: {
+      toolGroups: [{
+        title: "公众号-程序员阿诺",
+        background: "pink",
+        tools: [{
+          url: "https://qjyoung.github.io/",
+          name: "扫码关注&nbsp;<img src=\"./qrcode.png\" alt=\"公众号：程序员阿诺\" style=\"width: 90px;height: 90px\"/>",
+        },
+          {url: 'https://github.com/qjyoung', name: 'github'},
+          {url: '', name: ''},
+          {url: 'https://v.qq.com/x/page/n0536o6npn5.html', name: '一个人踩着单车去拉萨'},
+          {url: '', name: ''},
+          {url: 'https://mp.weixin.qq.com/s/QaU5B0m4Oo-hhIigu10ehg', name: '北疆2872公里之旅'},
+          {url: 'https://mp.weixin.qq.com/s/HARgAEd3G36cMgioiwA04A', name: '西藏，魂归之地'},
+          {url: '', name: ''},
+          {url: 'https://mp.weixin.qq.com/s/51b7n81DxyRjVoyyi2U-tA', name: '用vue写一个傻瓜式倒计时列表'},
+          {url: 'https://mp.weixin.qq.com/s/UhyQ5lnaqfV0i-O90OEQEw', name: 'git补丁的妙用，将代码差异化发布到外网github'},
+          {url: 'https://mp.weixin.qq.com/s/WSEz9CdUze8RNppATl6_kw', name: '这或许是封装的最优雅的Excel数据导出工具'},
+          {url: 'https://mp.weixin.qq.com/s/gf5G484F_Jbi0Ppwyzaq-w', name: '究极效率，一行sql拿到全流程测试数据'},
+          {url: 'https://mp.weixin.qq.com/s/X1R4ozZ_QmZZHa_2kCt0KA', name: '受宠若惊，竟被DDoS攻击了'},
+          {url: 'https://mp.weixin.qq.com/s/gttv67UBfCn-JapSfzHMlA', name: '商城下单-三方支付-时序图'},
+          {url: 'https://mp.weixin.qq.com/s/ZlK9vPLLkNFP73TPDrth5A', name: '借助lambda灵活控制事物粒度'},
+          {url: 'https://mp.weixin.qq.com/s/nbzWbws4o53tO42WZMFynA', name: '注解、代理简化redis分布式锁-实现代码'},
+          {url: 'https://mp.weixin.qq.com/s/ycdvhfzIP6Y_CpskCyrQmQ', name: '通用的区块链智能合约web3.go调用服务'},
+          {url: 'https://mp.weixin.qq.com/s/KJv8m_1exKeMEU__pGR4Ug', name: 'docker快速搭建elk-2-解析Java、go、nginx日志'},
+          {url: 'https://mp.weixin.qq.com/s/hoOZqeHwkvwWyP8BhCKP7Q', name: 'Git 多人协作，诸葛亮带你玩转cherry-pick 、rebase'},
+          {url: 'https://mp.weixin.qq.com/s/ZrDaT1kMT30EDqBLi28lUA', name: '精简版-五颜六色的常用工具面板-基于Vue'},
+          {url: 'https://mp.weixin.qq.com/s/fc9O0Yow6YQrhPepmCVHAw', name: 'SQL查看数据 - 借助view、group_concat节省你宝贵时间'},
+          {url: 'https://mp.weixin.qq.com/s/dunLcQ8O1gfwAf6jb4S1mA', name: '用VUE做一个常用工具面板'},
+          {url: 'https://mp.weixin.qq.com/s/IkQVKnA-iHG_fyJ0EDO9PQ', name: '被工具（Goland）坑的最惨的一次'},
+          {url: 'https://mp.weixin.qq.com/s/45zu-OcP5UNbLdj5X3hUwA', name: '做一个会偷懒的程序员'},
+          {url: 'https://mp.weixin.qq.com/s/VJIFYZchRjEzC2bzVladmw', name: 'idea定制groovy脚本，导出db数据到csv自动加行号和标题'},
+          {url: 'https://mp.weixin.qq.com/s/rn2IbAWIpRVRE631hPNUfg', name: '60行shell脚本快速生成Java项目脚手架'},
+          {url: 'https://mp.weixin.qq.com/s/iDA08QqL9xp3eo5znjWleA', name: '用docker快速搭建elk日志平台'},
+          {url: 'https://mp.weixin.qq.com/s/1m7OKcqOcB2e_2K_mFG_8A', name: '50行go实现tree命令'},
+          {url: 'https://mp.weixin.qq.com/s/EgE_sF8xmDfrkkX_zsdycA', name: '错怪Mybatis, 原来这并不是bug'},
+          {url: 'https://mp.weixin.qq.com/s/h-ZrmzfRjhdsxfZneMyvuw', name: '注解+代理 加持分布式锁，让代码更简洁'},
+          {url: 'https://mp.weixin.qq.com/s/kuJnTjMxdPv32E7a-r-zRQ', name: 'DIY插件，自动生成set调用，解放双手'},
+          {url: 'https://mp.weixin.qq.com/s/zm-f6ENkt93dU53K2mNVZg', name: 'Java回调、Lambda与Redis分布式锁新玩法'},
+          {url: 'https://mp.weixin.qq.com/s/_JCRYeo65c9CTklhqUJZBA', name: '巨烧脑-估计没几人能看懂:实现tree命令 - 探索你D盘的秘密'},
+          {url: 'https://mp.weixin.qq.com/s/BFU-IHHg422aHZX-c0_3IQ', name: '基于shiro的权限自动录入'},
+          {url: '', name: ''},
+          {url: 'https://mp.weixin.qq.com/s/gjpqdLBuMlvzkdY_qHI54A', name: '南天门上，三千忠魂奋孤勇；祭旗坡下，一腔热血照青山'},
+          {url: '', name: ''},
+          {url: 'https://mp.weixin.qq.com/s/a9gXbNS_U3JMvzaaKvdkrA', name: '2020年5月，比特币即将迎来第三次减半，为什么比特币会减半'},
+          {url: 'https://mp.weixin.qq.com/s/O04kd9SIvZcKHIRpHVz8Bw', name: '不小心敲了 rm -rf / 后反应是怎样的？'},
+          {url: 'https://mp.weixin.qq.com/s/T-IMeuMTgwC7ZIpYAo2EEQ', name: '星际穿越的完全解析'},
+          {url: 'https://mp.weixin.qq.com/s/D0RA8dv3e0_oDTdiN8CK8w', name: '奇记｜生死荒原路，52天首次单人完整横穿大羌塘'},
+          {url: '', name: ''},]
+      }],
+      countdown: {
+        title: "Countdown",
+        background: "FFE56F",
+        type: type_countdown,
+        tools: [{
+          date: "xxxx-09-16",
+          desc: "生日",
+          custom: true
+        }]
+      }
+    },
+    mounted() {
+      this.checkHolidays();
+      let doc = this.toolGroups[0];
+      this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
+      this.toolGroups[0] = doc;
+      this.countdown = this.getFromLocal("countdown", this.countdown);
+      setInterval(this.reloadCountDown, 1000 * 60 * 5);
+    },
+    methods: {
+      getFromLocal(key, field) {
+        let cache = JSON.parse(localStorage.getItem(key));
+        if (cache != null) {
+          return cache;
         }
-    });
+        return field;
+      },
+      reloadCountDown() {
+        this.checkHolidays();
+
+        let tools = this.countdown.tools;
+        let today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth() + 1;
+        let day = today.getDate();
+
+        let lastDiff = 0;
+        for (let i = 0; i < tools.length; i++) {
+          let item = tools[i];
+          if (!item.date) {
+            tools[i] = {
+              custom: item.custom || false,
+              diff: lastDiff + 0.00001
+            };
+            continue
+          }
+          let strings = item.date.split('-');
+          let _year = strings[0], _month = strings[1], _day = strings[2];
+          _year = _year === 'xxxx' ? year : _year;
+          if ('xx' === _month) {
+            _month = month;
+            if (day >= parseInt(_day)) {
+              if (month === 12 && strings[0] === 'xxxx') {
+                _year = year + 1;
+                _month = 1;
+              } else {
+                _month = month + 1;
+              }
+            }
+          }
+          let date = [_year, _month, _day].join('-');
+          let diff = (new Date(date).getTime() - today.getTime()) / 1000 / 3600 / 24;
+          if (diff < 0) {
+            tools.splice(i, 1);
+            i--;
+            continue
+          }
+          lastDiff = diff;
+          tools[i] = {
+            date: item.date,
+            desc: item.desc,
+            custom: item.custom || false,
+            diff: diff,
+            name: date.replace(_year + "-", "") + "\t<strong style='color: black'>" + item.desc + "</strong>\t" + Math.floor(diff) + "天"
+          };
+        }
+        tools.sort(function (a, b) {
+          let res = a.custom - b.custom;
+          if (res !== 0) {
+            return res;
+          }
+          return a.diff - b.diff;
+        });
+        localStorage.setItem("countdown", JSON.stringify(this.countdown));
+      },
+      checkHolidays() {
+        let this0 = this;
+        let date = new Date();
+        let year = date.getFullYear();
+        let localYear = localStorage.getItem("year");
+        if (localYear !== undefined && localYear === year + "") {
+          return
+        }
+        $.ajax({
+          type: "GET",
+          url: 'https://api.apihubs.cn/holiday/get?field=date,holiday&year=' + year + '&holiday_today=1&holiday_legal=1&order_by=1&cn=1&size=31',
+          dataType: 'json',
+          success: function (data) {
+            let holidays = [];
+            if (data.code === 0) {
+              data.data.list.forEach(each => {
+                let date = each.date_cn;
+                date = date.replace(/年|月/g, "-");
+                date = date.replace('日', "");
+                holidays.push({
+                  date: date,
+                  desc: each.holiday_cn
+                })
+              })
+            }
+
+            holidays.push({})
+            let nextYear = year + 1;
+            holidays.push({
+              date: nextYear + "-01-01",
+              desc: nextYear + "年"
+            });
+            holidays.push({})
+
+            localStorage.setItem("year", year);
+            let tools = this0.countdown.tools.filter(item => {
+              return item.custom
+            })
+            this0.countdown.tools = [...tools, ...holidays];
+          }
+        });
+      },
+    },
+    watch: {
+      toolGroups: {
+        handler(groups) {
+          localStorage.setItem("toolGroups", JSON.stringify(groups));
+        },
+        deep: true
+      },
+      "countdown.tools.length": {
+        handler(val) {
+          this.reloadCountDown();
+        }
+      }
+    }
+  })
 </script>
 </html>
