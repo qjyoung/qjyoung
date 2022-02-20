@@ -4,14 +4,13 @@
           content='width = device-width,initial-scale = 1,minimum-scale = 1, maximum-scale = 1, user-scalable = no'/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
-    <title>blog.siyueren.com</title>
+    <title>公众号：程序员阿诺</title>
     <style>
         body {
             margin: 0 auto;
             padding: 50px 0 300px 0;
             font-family: Tahoma, Verdana, Arial, sans-serif;
-            background: url(./2379.min.jpeg) no-repeat;
-            /*background: url(http://pic.qjyoung.top/2379.min.jpeg) no-repeat;*/
+            background: url(./2379.min.jpeg) no-repeat; /*background: url(http://pic.qjyoung.top/2379.min.jpeg) no-repeat;*/
         }
 
         @media (min-width: 768px) {
@@ -48,40 +47,17 @@
             font-size: 20px;
         }
 
-        a:link {
-            color: blue
-        }
-
-        a:visited {
-            color: blue
+        a:link, a:visited, a:active {
+            text-decoration: none;
+            color: blue;
         }
 
         a:hover {
-            color: blue;
             text-decoration: underline;
         }
-
-        a:active {
-            color: blue
-        }
-
-        a {
-            text-decoration: none;
-        }
     </style>
-
-    <script>
-        var _hmt = _hmt || [];
-        (function () {
-            let hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?9af9c46c970d24ceed26f5283d61aaf0";
-            let s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();
-    </script>
-
+    <script src="x.js"></script>
 </head>
-
 
 <body>
 <div class="wrap">
@@ -113,11 +89,11 @@
     -->
 
     <!-- <p><a target="_blank" href="https://pan.baidu.com/ s/1EU5zvfudPUKNnXiUldAukA"><strong style="font-size: 33px; margin:10px">浪</strong><strong style="font-size: 30px; margin:10px">浪</strong><strong style="font-size: 15px; margin:10px">浪</strong><strong style="font-size: 20px; margin:10px">浪</strong><strong style="font-size: 10px; margin:10px">浪</strong><strong style="font-size: 28px; margin:10px">浪</strong><strong style="font-size: 25px; margin:10px">浪</strong><strong style="font-size: 22px; margin:10px">浪</strong><strong style="font-size: 18px; margin:10px">浪</strong>~<strong style="font-size: 13px; margin:10px">在</strong><strong style="font-size: 50px; margin:10px">西藏</strong></a></p> -->
-
     <p><a target="_blank" href="http://test.qiaojianyong.top/">3d轨迹（加载较慢）</a></p>
     <p><a target="_blank" href="https://v.qq.com/x/page/n0536o6npn5.html">视频</a></p>
-    <p><a target="_blank" href="./altitude-line.html">海拔-2d</a></p>
-    <p><a target="_blank" href="./altitude-3d.html">经纬海拔-3d</a></p>
+    <p><a target="_blank" href="318/altitude-line.html">318海拔-2d</a></p>
+    <p><a target="_blank" href="318/altitude-3d.html">318经纬海拔-3d</a></p>
+    <p><a target="_blank" href="318/track/index.html">318-3d轨迹</a></p>
     <p>
         <span>日期&nbsp;&nbsp;&nbsp;</span><input id="date"/>
         <button onclick="now(1)">now()</button>
@@ -158,82 +134,81 @@
     <p><a target="_blank" href="http://www.txttool.com/WenBen_Sort4.asp">在线字典排序</a></p>
 </div>
 <script>
-    window.onload = function () {
-        now(1);
-    };
+  window.onload = function () {
+    now(1);
+  };
 
-    function now(n) {
-        let date;
-        let timestamp;
-        let dateInput = document.getElementById("date");
-        let timestampInput = document.getElementById("timestamp");
-        let timestampInput_s = document.getElementById("timestamp_s");
-
-        switch (n) {
-            case 1:
-                date = new Date();
-                timestamp = date.getTime();
-                dateInput.value = timestampToTime(timestamp);
-                timestampInput.value = timestamp;
-                timestampInput_s.value = parseInt(timestamp / 1000);
-                break;
-            case 2:
-                timestamp = timestampInput.value;
-                dateInput.value = timestampToTime(timestamp);
-                timestampInput_s.value = parseInt(timestamp / 1000);
-                break;
-            case 21:
-                timestamp = timestampInput_s.value;
-                dateInput.value = timestampToTime(timestamp * 1000);
-                timestampInput.value = timestamp * 1000;
-                break;
-            case 3:
-                date = new Date(dateInput.value);
-                timestampInput.value = date.getTime();
-                timestampInput_s.value = parseInt(date.getTime() / 1000);
-                break;
-        }
+  function now(n) {
+    let date;
+    let timestamp;
+    let dateInput = document.getElementById("date");
+    let timestampInput = document.getElementById("timestamp");
+    let timestampInput_s = document.getElementById("timestamp_s");
+    switch (n) {
+      case 1:
+        date = new Date();
+        timestamp = date.getTime();
+        dateInput.value = formatTimestamp(timestamp);
+        timestampInput.value = timestamp;
+        timestampInput_s.value = parseInt(timestamp / 1000);
+        break;
+      case 2:
+        timestamp = timestampInput.value;
+        dateInput.value = formatTimestamp(timestamp);
+        timestampInput_s.value = parseInt(timestamp / 1000);
+        break;
+      case 21:
+        timestamp = timestampInput_s.value;
+        dateInput.value = formatTimestamp(timestamp * 1000);
+        timestampInput.value = timestamp * 1000;
+        break;
+      case 3:
+        date = new Date(dateInput.value);
+        timestampInput.value = date.getTime();
+        timestampInput_s.value = parseInt(date.getTime() / 1000);
+        break;
     }
+  }
 
-    function timestampToTime(timestamp) {
-        let date = new Date(parseInt(timestamp));
-        let Y = date.getFullYear() + '-';
-        let M = this.formatNumber(date.getMonth() + 1) + '-';
-        let D = this.formatNumber(date.getDate()) + ' ';
-        let h = this.formatNumber(date.getHours()) + ':';
-        let m = this.formatNumber(date.getMinutes()) + ':';
-        let s = this.formatNumber(date.getSeconds());
-        return Y + M + D + h + m + s;
-    }
+  function formatTimestamp(timestamp) {
+    let date = new Date(parseInt(timestamp));
+    let Y = date.getFullYear() + '-';
+    let M = this.formatNumber(date.getMonth() + 1) + '-';
+    let D = this.formatNumber(date.getDate()) + ' ';
+    let h = this.formatNumber(date.getHours()) + ':';
+    let m = this.formatNumber(date.getMinutes()) + ':';
+    let s = this.formatNumber(date.getSeconds());
+    return Y + M + D + h + m + s;
+  }
 
-    function formatNumber(num) {
-        return num < 10 ? '0' + num : num;
-    }
+  function formatNumber(num) {
+    return num < 10 ? '0' + num : num;
+  }
 </script>
 
 <script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
 <script>
-    L2Dwidget.init({
-        "model": {
-            jsonPath: "https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json",
-            "scale": 1
-        },
-        "display": {
-            "position": "right",
-            "width": 100,
-            "height": 200,
-            "hOffset": 0,
-            "vOffset": -20
-        },
-        "mobile": {
-            "show": true,
-            "scale": 0.5
-        },
-        "react": {
-            "opacityDefault": 1,
-            "opacityOnHover": 0.2
-        }
-    });
+  L2Dwidget.init({
+    "model": {
+      jsonPath: "https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json",
+      "scale": 1
+    },
+    "display": {
+      "position": "right",
+      "width": 100,
+      "height": 200,
+      "hOffset": 0,
+      "vOffset": -20
+    },
+    "mobile": {
+      "show": true,
+      "scale": 0.5
+    },
+    "react": {
+      "opacityDefault": 1,
+      "opacityOnHover": 0.2
+    }
+  });
 </script>
 
 </body>
