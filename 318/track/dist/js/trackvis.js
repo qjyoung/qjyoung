@@ -119,7 +119,7 @@
       2 === arguments.length && (n = e, e = void 0),
         //jsonp("//www.imxingzhe.com/api/v4/workout_points/" + workoutID + "/
         //http://www.runoob.com/try/ajax/jsonp.php?jsoncallback=callbackFunction
-        jsonp("http://www.runoob.com/try/ajax/jsonp.php", function (t) {
+        jsonp("https://www.runoob.com/try/ajax/jsonp.php", function (t) {
           // console.log(t);
           t = track_data;
           // console.log(t);
