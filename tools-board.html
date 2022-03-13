@@ -8,6 +8,7 @@
         a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}
     </style>
     <script src="x.js"></script>
+    <script src="calendar/lunar.js"></script>
     <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
 </head>
@@ -39,6 +40,9 @@
                             <h1 v-bind:class="!group.custom?\'\':\'title\'">{{group.title===""?"请输入标题":group.title}}\
                                 <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>\
                             </h1>\
+                            <p v-if="group.type===type_countdown" style="height: 150px">\
+                                <span v-html="group.today"></span>\
+                            </p>\
                             <ol style="margin-bottom: 22px">\
                                 <template v-for="tool in group.tools">\
                                     <li class="item" style="padding-right: 2px">\
@@ -76,37 +80,83 @@
             });
           },
           newItem(group) {
-            let date = '';
+            let date = '', isLunar = false;
+            let year = 'xxxx', month = 'xx', day = '';
             if (group.type === type_countdown) {
-              let strings = this.date.split('-');
-              let length = strings.length;
-              if (length > 3 || length === 0) {
-                alert("error date");
-                return;
-              }
-              let year = 'xxxx', month = 'xx', day = strings[length - 1];
-              if (length > 1) {
-                month = strings[length - 2];
-              }
-              if (length > 2) {
-                year = strings[length - 3];
-              }
-              if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
-                alert("error year");
-                return;
-              }
-              if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
-                alert("error month")
-                return
-              }
-              if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
-                alert("error day")
-                return
+              if (/[\u4E00-\u9FA5]/.test(this.date)) {
+                isLunar = true;
+                let strings = this.date.split("年");
+                if (strings.length > 2) {
+                  alert("error date");
+                  return;
+                }
+                if (strings.length === 2) {
+                  year = strings[0] === '' ? year : strings[0];
+                }
+                if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
+                  alert("error year");
+                  return;
+                }
+
+                strings = strings[strings.length - 1].split("月");
+                if (strings.length > 2) {
+                  alert("error month");
+                  return;
+                }
+
+                if (strings.length === 2) {
+                  month = strings[0] === '' ? month : strings[0];
+                  let _month = month;
+                  if (_month !== 'xx') {
+                    _month = _month.replace('闰', '');
+                    if (_month.length > 2) {
+                      alert("error month");
+                      return;
+                    }
+                    if (_month.length === 2 && _month[0] !== '十') {
+                      alert("error month");
+                      return;
+                    }
+                    if (XXXUnits.indexOf(_month[_month.length - 1]) < 0) {
+                      alert("error month");
+                      return;
+                    }
+                  }
+                }
+                day = strings[strings.length - 1];
+              } else {
+                let strings = this.date.split('-');
+                let length = strings.length;
+                if (length > 3 || length === 0) {
+                  alert("error date");
+                  return;
+                }
+                day = strings[length - 1];
+                if (length > 1) {
+                  month = strings[length - 2];
+                }
+                if (length > 2) {
+                  year = strings[length - 3];
+                }
+                if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
+                  alert("error year");
+                  return;
+                }
+                if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
+                  alert("error month")
+                  return
+                }
+                if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
+                  alert("error day")
+                  return
+                }
               }
               date = [year, month, day].join('-');
             }
             group.tools.push({
               date: date,
+              lunarDate: isLunar ? date : '',
+              isLunar: isLunar,
               desc: this.desc,
               name: this.name || "空",
               url: this.url,
@@ -126,7 +176,7 @@
         },
           {url: 'https://github.com/qjyoung', name: 'github'},
           {url: '', name: ''},
-          {url: 'https://v.qq.com/x/page/n0536o6npn5.html', name: '一个人踩着单车去拉萨'},
+          {url: 'https://v.qq.com/x/page/n0536o6npn5.html', name: '踩着单车去拉萨'},
           {url: '', name: ''},
           {url: 'https://mp.weixin.qq.com/s/QaU5B0m4Oo-hhIigu10ehg', name: '北疆2872公里之旅'},
           {url: 'https://mp.weixin.qq.com/s/HARgAEd3G36cMgioiwA04A', name: '西藏，魂归之地'},
@@ -167,13 +217,21 @@
           {url: '', name: ''},]
       }],
       countdown: {
-        title: "Countdown",
+        title: "倒计时",
         background: "FFE56F",
         type: type_countdown,
+        today: '',
         tools: [{
           date: "xxxx-09-16",
-          desc: "生日",
+          desc: "公历生日",
           custom: true
+        }, {
+          lunarDate: "xxxx-八-十二",
+          date: "xxxx-09-16",
+
+          desc: "农历生日",
+          custom: true,
+          isLunar: true,
         }]
       }
     },
@@ -183,6 +241,7 @@
       this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
       this.toolGroups[0] = doc;
       this.countdown = this.getFromLocal("countdown", this.countdown);
+      this.reloadCountDown();
       setInterval(this.reloadCountDown, 1000 * 60 * 5);
     },
     methods: {
@@ -196,12 +255,17 @@
       reloadCountDown() {
         this.checkHolidays();
 
+        let html = '<p>';
+        html += `<span style="text-align:center;float: left;height:156px;width: 150px;border:2px solid #0da0ec;"> ${getDate(new Date())} </span>`;
+        html += '</p>'
+        this.countdown.today = html;
+
         let tools = this.countdown.tools;
         let today = new Date();
         let year = today.getFullYear();
         let month = today.getMonth() + 1;
         let day = today.getDate();
-
+        today = new Date(year, today.getMonth(), day);
         let lastDiff = 0;
         for (let i = 0; i < tools.length; i++) {
           let item = tools[i];
@@ -212,7 +276,7 @@
             };
             continue
           }
-          let strings = item.date.split('-');
+          let strings = item.isLunar ? item.lunarDate.split('-') : item.date.split('-');
           let _year = strings[0], _month = strings[1], _day = strings[2];
           _year = _year === 'xxxx' ? year : _year;
           if ('xx' === _month) {
@@ -226,7 +290,34 @@
               }
             }
           }
-          let date = [_year, _month, _day].join('-');
+          let date, name;
+          if (item.isLunar) {
+            let yearBeginTime = new Date(_year, today.getMonth(), 1).getTime();
+            let found = false;
+            for (let j = 0; j < 366; j++) {
+              let theDate = new Date(yearBeginTime + 86400000 * j);
+              let lunar = new Lunar(theDate);
+              if (lunar.chineseMonth === _month && lunar.chineseDay === _day) {
+                found = true;
+                date = lunar.dateString;
+                name = lunar.dateString.replace(_year + "-", "") + ' ';
+                name += lunar.chineseMonth + '月' + lunar.chineseDay;
+                break
+              }
+            }
+
+            if (!found) {
+              if (strings[0] !== 'xxxx') {
+                tools.splice(i, 1);
+                i--;
+              }
+              // TODO show hide
+              continue;
+            }
+          } else {
+            date = [_year, _month, _day].join('-');
+            name = date.replace(_year + "-", "");
+          }
           let diff = (new Date(date).getTime() - today.getTime()) / 1000 / 3600 / 24;
           if (diff < 0) {
             tools.splice(i, 1);
@@ -234,12 +325,16 @@
             continue
           }
           lastDiff = diff;
+
+          name = name.replace(_year + "年", '');
           tools[i] = {
             date: item.date,
+            lunarDate: item.isLunar ? item.lunarDate : '',
+            isLunar: item.isLunar,
             desc: item.desc,
             custom: item.custom || false,
             diff: diff,
-            name: date.replace(_year + "-", "") + "\t<strong style='color: black'>" + item.desc + "</strong>\t" + Math.floor(diff) + "天"
+            name: name + "\t<strong style='color: black'>" + item.desc + "</strong>\t" + Math.floor(diff) + "天"
           };
         }
         tools.sort(function (a, b) {
@@ -253,45 +348,38 @@
       },
       checkHolidays() {
         let this0 = this;
-        let date = new Date();
-        let year = date.getFullYear();
-        let localYear = localStorage.getItem("year");
-        if (localYear !== undefined && localYear === year + "") {
+        let today = new Date();
+        let date = today.getDate();
+        let localDate = localStorage.getItem("date");
+        if (date !== undefined && localDate === date + "") {
           return
         }
-        $.ajax({
-          type: "GET",
-          url: 'https://api.apihubs.cn/holiday/get?field=date,holiday&year=' + year + '&holiday_today=1&holiday_legal=1&order_by=1&cn=1&size=31',
-          dataType: 'json',
-          success: function (data) {
-            let holidays = [];
-            if (data.code === 0) {
-              data.data.list.forEach(each => {
-                let date = each.date_cn;
-                date = date.replace(/年|月/g, "-");
-                date = date.replace('日', "");
-                holidays.push({
-                  date: date,
-                  desc: each.holiday_cn
-                })
-              })
+        let holidays = [];
+
+        let yearBeginTime = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+        for (let j = 0; j < 366; j++) {
+          let theDate = new Date(yearBeginTime + 86400000 * j);
+          let lunar = new Lunar(theDate);
+          let _festivals = festivals(lunar)
+          _festivals.forEach(value => {
+            if (value.festival.indexOf("*") > 0) {
+
+              holidays.push({
+                date: lunar.dateString,
+                lunarDate: ['xxxx', lunar.chineseMonth, lunar.chineseDay].join('-'),
+                isLunar: value.isLunar,
+                desc: value.festival.replace('*', '')
+              });
             }
+          })
+        }
+        holidays.push({})
 
-            holidays.push({})
-            let nextYear = year + 1;
-            holidays.push({
-              date: nextYear + "-01-01",
-              desc: nextYear + "年"
-            });
-            holidays.push({})
-
-            localStorage.setItem("year", year);
-            let tools = this0.countdown.tools.filter(item => {
-              return item.custom
-            })
-            this0.countdown.tools = [...tools, ...holidays];
-          }
-        });
+        localStorage.setItem("date", date);
+        let tools = this0.countdown.tools.filter(item => {
+          return item.custom
+        })
+        this0.countdown.tools = [...tools, ...holidays];
       },
     },
     watch: {
