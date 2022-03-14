@@ -40,7 +40,7 @@
                             <h1 v-bind:class="!group.custom?\'\':\'title\'">{{group.title===""?"请输入标题":group.title}}\
                                 <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>\
                             </h1>\
-                            <p v-if="group.type===type_countdown" style="height: 150px">\
+                            <p v-if="group.type===type_countdown" style="height: 150px;padding-left: 20px">\
                                 <span v-html="group.today"></span>\
                             </p>\
                             <ol style="margin-bottom: 22px">\
@@ -215,6 +215,39 @@
           {url: 'https://mp.weixin.qq.com/s/T-IMeuMTgwC7ZIpYAo2EEQ', name: '星际穿越的完全解析'},
           {url: 'https://mp.weixin.qq.com/s/D0RA8dv3e0_oDTdiN8CK8w', name: '奇记｜生死荒原路，52天首次单人完整横穿大羌塘'},
           {url: '', name: ''},]
+      }, {
+        title: "实用小工具",
+        custom: true,
+        background: "22e674",
+        tools: [
+          {url: '.', name: '主页'},
+          {url: './calendar', name: '万年历'},
+          {url: './format', name: 'JSON-格式化'},
+          {url: 'http://tool.oschina.net/codeformat/xml', name: '其他代码格式化'},
+          {url: 'http://cron.qqe2.com/', name: '在线Cron表达式生成器'},
+          {url: 'http://tool.chinaz.com/tools/unicode.aspx', name: 'Unicode编码'},
+          {url: 'http://www.bejson.com/xml2json/', name: 'XML 2 JSON'},
+          {url: './json2bean', name: 'JSON 2 BEAN'},
+          {url: './encrypt/encrypt.html', name: 'AES-DES'},
+          {url: 'http://tool.chacuo.net/cryptaes', name: 'AES-2'},
+          {url: './encrypt/encrypt2.html', name: '哈希散列'},
+          {url: 'https://tool.lu/hexconvert/', name: '进制转换'},
+          {url: './encrypt/encrypt3.html', name: 'BASE64编码'},
+          {url: './encrypt/encrypt4.html', name: '图片转base64'},
+          {url: 'https://c.runoob.com/front-end/59/', name: '图片BASE64编码'},
+          {url: 'https://cli.im/', name: '二维码生成器'},
+          {url: 'http://www.jq22.com/textDifference', name: 'Show diff'},
+          {url: 'http://tool.oschina.net/jscompress/', name: 'js/css compresss'},
+          {url: 'http://imgbase64.duoshitong.com/', name: '图片 base64 互转'},
+          {url: 'https://www.ip.cn', name: 'IP 域名地址查询'},
+          {url: 'https://github.com/qjyoung', name: 'qjyoung-github'},
+          {url: 'https://blog.csdn.net/qq_33303700', name: 'qjyoung-CSDN'},
+          {url: 'https://www.bootcdn.cn/', name: '开源项目CDN'},
+          {url: 'http://www.yuangongju.com/css3button', name: 'css-button'},
+          {url: 'http://www.jq22.com/webqd5122', name: 'css-input'},
+          {url: 'https://www.processon.com/', name: 'processon'},
+          {url: 'http://www.txttool.com/WenBen_Sort4.asp', name: '在线字典排序'},
+        ]
       }],
       countdown: {
         title: "倒计时",
@@ -227,16 +260,15 @@
           custom: true
         }, {
           lunarDate: "xxxx-八-十二",
-          date: "xxxx-09-16",
-
-          desc: "农历生日",
-          custom: true,
           isLunar: true,
+          date: "xxxx-09-16",
+          desc: "农历生日",
+          custom: true
         }]
       }
     },
     mounted() {
-      this.checkHolidays();
+      // this.checkHolidays();
       let doc = this.toolGroups[0];
       this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
       this.toolGroups[0] = doc;
@@ -255,17 +287,15 @@
       reloadCountDown() {
         this.checkHolidays();
 
-        let html = '<p>';
-        html += `<span style="text-align:center;float: left;height:156px;width: 150px;border:2px solid #0da0ec;"> ${getDate(new Date())} </span>`;
-        html += '</p>'
-        this.countdown.today = html;
+        this.countdown.today = `<span style="text-align:center;float: left;height:156px;width: 150px;border:2px solid #0da0ec;"> ${getDate(new Date())} </span>`;
 
         let tools = this.countdown.tools;
         let today = new Date();
         let year = today.getFullYear();
-        let month = today.getMonth() + 1;
+        let month = today.getMonth();
         let day = today.getDate();
-        today = new Date(year, today.getMonth(), day);
+        today = new Date(year, month, day);
+        month += 1;
         let lastDiff = 0;
         for (let i = 0; i < tools.length; i++) {
           let item = tools[i];
@@ -350,10 +380,10 @@
         let this0 = this;
         let today = new Date();
         let date = today.getDate();
-        let localDate = localStorage.getItem("date");
-        if (date !== undefined && localDate === date + "") {
-          return
-        }
+        // let localDate = localStorage.getItem("date");
+        // if (date !== undefined && localDate === date + "") {
+        //   return
+        // }
         let holidays = [];
 
         let yearBeginTime = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
@@ -363,7 +393,6 @@
           let _festivals = festivals(lunar)
           _festivals.forEach(value => {
             if (value.festival.indexOf("*") > 0) {
-
               holidays.push({
                 date: lunar.dateString,
                 lunarDate: ['xxxx', lunar.chineseMonth, lunar.chineseDay].join('-'),
@@ -375,11 +404,11 @@
         }
         holidays.push({})
 
-        localStorage.setItem("date", date);
         let tools = this0.countdown.tools.filter(item => {
           return item.custom
         })
         this0.countdown.tools = [...tools, ...holidays];
+        localStorage.setItem("date", date);
       },
     },
     watch: {

@@ -36,16 +36,18 @@ class Lunar {
 
     let days = (date - XXXBaseDate) / 86400000;
     this.days = days + 40
-    this.months = 14
+    this.months = 1478; /*14*/
 
-    let year
-    for (year = XXXBaseYear; year < XXXMaxSupportYear && days > 0; year++) {
-      days -= this.yearDays(year)
-      this.months += 12
+    let year,
+      yearBegin = 2022/*XXXBaseYear*/,
+      daysPast = 44561;
+    for (year = yearBegin; year < XXXMaxSupportYear && days - daysPast > 0; year++) {
+      daysPast += this.yearDays(year);
+      this.months += 12;
     }
+    days -= daysPast;
     if (days < 0) {
-      days += this.yearDays(year - 1);
-      year--;
+      days += this.yearDays(--year);
       this.months -= 12
     }
     this.year = year
