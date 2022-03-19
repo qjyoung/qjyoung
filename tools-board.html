@@ -73,10 +73,10 @@
         <ol style="margin-bottom: 22px">
             <template v-for="tool in countdown.tools">
                 <li class="item" v-if="!tool.hide">
-                    <span style="display:inline-block;" :style="{width:descWidth+'px'}">
+                    <span style="display:inline-block;" :style="{width:countdown.descWidth+'px'}">
                         <strong style='color: black' v-html="tool.desc"></strong>
                     </span>
-                    <span style="display:inline-block;" :style="{width:diffWidth+'px',color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
+                    <span style="display:inline-block;" :style="{width:countdown.diffWidth+'px',color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
                     <span v-html="tool.time"></span>
                     <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="countdown.tools.splice(countdown.tools.indexOf(tool),1)">❌</span>
                 </li>
@@ -92,8 +92,6 @@
 </div>
 </body>
 <script>
-  let type_tool = 1;
-  let type_countdown = 2;
   let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
   new Vue({
     el: '#app',
@@ -184,11 +182,12 @@
       countdown: {
         title: "倒计时",
         background: "FFE56F",
-        type: type_countdown,
         date: new Date(),
         lunar: new Lunar(new Date()),
         time: '',
         festivals: '',
+        descWidth: 0,
+        diffWidth: 0,
         tools: [{
           date: "xxxx-09-16",
           desc: "公历生日",
@@ -204,9 +203,7 @@
       name: "程序员阿诺",
       url: "https://qjyoung.github.io",
       date: "",
-      desc: "",
-      descWidth: 0,
-      diffWidth: 0
+      desc: ""
     },
     mounted() {
       let doc = this.toolGroups[0];
@@ -216,6 +213,9 @@
       this.countdown.tools = this.getFromLocal("countdown", this.countdown).tools.filter(item => {
         return item.custom
       });
+
+      this.findHolidays();
+      this.reloadCountDown();
 
       this.updateTime();
       setInterval(this.updateTime, 1000);
@@ -417,8 +417,8 @@
           item.diff = lastDiff = diff;
           item.time = this.formatDate(thatDate).replace(thisYear + "-", "") + name;
         }
-        this.descWidth = maxDescWidth;
-        this.diffWidth = maxDiffWidth;
+        this.countdown.descWidth = maxDescWidth;
+        this.countdown.diffWidth = maxDiffWidth;
         tools.sort(function (a, b) {
           let res = a.custom - b.custom;
           if (res !== 0) {
