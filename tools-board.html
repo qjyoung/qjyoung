@@ -3,19 +3,92 @@
     <meta charSet="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="keywords" content="程序员阿诺,阿诺,倒计时,倒计时列表,实用小工具,高考倒计时,春节,春节倒计时"/>
     <title>公众号：程序员阿诺</title>
     <style>
-        a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}
+        body {font-family: Tahoma, Verdana, Arial, sans-serif;}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}  td {padding-left: 5px;}
     </style>
     <script src="x.js"></script>
     <script src="calendar/lunar.js"></script>
-    <script src="https://cdn.bootcss.com/vue/2.6.10/vue.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script src="vue.min.js"></script>
 </head>
 <body>
+<span id="ruler" style="position:absolute;visibility: hidden;"></span>
+<script !src="">
+  String.prototype.visualLength = function () {
+    var ruler = document.getElementById('ruler');
+    ruler.innerHTML = this;
+    return ruler.offsetWidth;
+  }
+</script>
 <div id="app" style="width:100%;height: 100%;">
-    <tools-board v-bind:tool_groups="toolGroups"></tools-board>
-    <tools-board v-bind:tool_groups="[countdown]"></tools-board>
+    <div>
+        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in toolGroups">
+            <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
+                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
+            </h1>
+            <ol style="margin-bottom: 22px">
+                <template v-for="tool in group.tools">
+                    <li class="item" style="padding-right: 2px">
+                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
+                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
+                    </li>
+                </template>
+            </ol>
+            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
+                <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>
+                <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>
+                <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
+            </div>
+            <div class="badge up item-x" v-if="group.custom">
+                <span class="my-button" @click="toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
+            </div>
+            <div class="badge down item-x">
+                <span class="my-button" @click="newGroup(group)">➕</span>
+            </div>
+        </div>
+    </div>
+    <div class="board item" style="backgroundColor:FFE56F">
+        <h1>倒计时</h1>
+        <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
+            <span v-html="formatDate(countdown.date)"></span><br>
+            <span v-html="weekday(countdown.date)"></span>
+            <span style="color: black; ">{{countdown.time}}</span><br>
+            <span style="color: violet; ">{{`${countdown.lunar.chineseYear}【${countdown.lunar.animal}】年 ${countdown.lunar.cyclical(countdown.lunar.months)}月 ${countdown.lunar.cyclical(countdown.lunar.days+1)}日`}}</span><br>
+            <span style="color: #000066; ">{{`${countdown.lunar.chineseMonth}月${countdown.lunar.chineseDay}`}}</span><br>
+            <span style="background-color:#ccffcc; color:#000066">{{countdown.festivals}}</span>
+        </div>
+        <ol>
+            <template v-for="tool in holidays">
+                <li>
+                    <span style="width: 48px;display: inline-block">
+                        <strong style='color: black' v-html="tool.desc"></strong>
+                    </span>
+                    <span style="width: 43px;display: inline-block;" :style="{color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
+                    <span v-html="tool.time"></span>
+                </li>
+            </template>
+        </ol>
+
+        <ol style="margin-bottom: 22px">
+            <template v-for="tool in countdown.tools">
+                <li class="item" v-if="!tool.hide">
+                    <span style="display:inline-block;" :style="{width:descWidth+'px'}">
+                        <strong style='color: black' v-html="tool.desc"></strong>
+                    </span>
+                    <span style="display:inline-block;" :style="{width:diffWidth+'px',color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
+                    <span v-html="tool.time"></span>
+                    <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="countdown.tools.splice(countdown.tools.indexOf(tool),1)">❌</span>
+                </li>
+            </template>
+        </ol>
+
+        <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
+            <input type="text" style="width: 40%" placeholder="日期" v-model="date"/>
+            <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>
+            <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
+        </div>
+    </div>
 </div>
 </body>
 <script>
@@ -24,155 +97,13 @@
   let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
   new Vue({
     el: '#app',
-    components: {
-      toolsBoard: {
-        props: ['tool_groups'],
-        data() {
-          return {
-            name: "乔健勇",
-            url: "https://qjyoung.github.io",
-            date: "xxxx-10-05",
-            desc: "xxxx==当年"
-          }
-        },
-        template: '<div>\
-                        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in tool_groups">\
-                            <h1 v-bind:class="!group.custom?\'\':\'title\'">{{group.title===""?"请输入标题":group.title}}\
-                                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>\
-                            </h1>\
-                            <p v-if="group.type===type_countdown" style="height: 150px;padding-left: 20px">\
-                                <span v-html="group.today"></span>\
-                            </p>\
-                            <ol style="margin-bottom: 22px">\
-                                <template v-for="tool in group.tools">\
-                                    <li class="item" style="padding-right: 2px">\
-                                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>\
-                                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="group.tools.splice(group.tools.indexOf(tool),1)">❌</span>\
-                                    </li>\
-                                </template>\
-                            </ol>\
-                            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom||group.type===type_countdown">\
-                                <template  v-if="group.type===type_countdown">\
-                                    <input type="text" style="width: 40%" placeholder="日期" v-model="date"/>\
-                                    <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>\
-                                </template>\
-                                <template  v-else>\
-                                    <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>\
-                                    <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>\
-                                </template>\
-                                <span class="my-button" style="position: absolute;margin-left: 3px"  @click="newItem(group)">✅<span/>\
-                            </div>\
-                            <div class="badge up item-x" v-if="group.custom">\
-                                <span class="my-button" @click="tool_groups.splice(tool_groups.indexOf(group),1)">❌</span>\
-                            </div>\
-                            <div class="badge down item-x" v-if="group.type!==type_countdown">\
-                                <span class="my-button" @click="newGroup(group)">➕</span>\
-                            </div>\
-                        </div>\
-                    </div>',
-        methods: {
-          newGroup(previousGroup) {
-            this.tool_groups.splice(this.tool_groups.indexOf(previousGroup) + 1, 0, {
-              title: "请输入标题",
-              custom: true,
-              background: colors[Math.ceil(Math.random() * colors.length)],
-              tools: []
-            });
-          },
-          newItem(group) {
-            let date = '', isLunar = false;
-            let year = 'xxxx', month = 'xx', day = '';
-            if (group.type === type_countdown) {
-              if (/[\u4E00-\u9FA5]/.test(this.date)) {
-                isLunar = true;
-                let strings = this.date.split("年");
-                if (strings.length > 2) {
-                  alert("error date");
-                  return;
-                }
-                if (strings.length === 2) {
-                  year = strings[0] === '' ? year : strings[0];
-                }
-                if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
-                  alert("error year");
-                  return;
-                }
-
-                strings = strings[strings.length - 1].split("月");
-                if (strings.length > 2) {
-                  alert("error month");
-                  return;
-                }
-
-                if (strings.length === 2) {
-                  month = strings[0] === '' ? month : strings[0];
-                  let _month = month;
-                  if (_month !== 'xx') {
-                    _month = _month.replace('闰', '');
-                    if (_month.length > 2) {
-                      alert("error month");
-                      return;
-                    }
-                    if (_month.length === 2 && _month[0] !== '十') {
-                      alert("error month");
-                      return;
-                    }
-                    if (XXXUnits.indexOf(_month[_month.length - 1]) < 0) {
-                      alert("error month");
-                      return;
-                    }
-                  }
-                }
-                day = strings[strings.length - 1];
-              } else {
-                let strings = this.date.split('-');
-                let length = strings.length;
-                if (length > 3 || length === 0) {
-                  alert("error date");
-                  return;
-                }
-                day = strings[length - 1];
-                if (length > 1) {
-                  month = strings[length - 2];
-                }
-                if (length > 2) {
-                  year = strings[length - 3];
-                }
-                if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
-                  alert("error year");
-                  return;
-                }
-                if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
-                  alert("error month")
-                  return
-                }
-                if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
-                  alert("error day")
-                  return
-                }
-              }
-              date = [year, month, day].join('-');
-            }
-            group.tools.push({
-              date: date,
-              lunarDate: isLunar ? date : '',
-              isLunar: isLunar,
-              desc: this.desc,
-              name: this.name || "空",
-              url: this.url,
-              custom: true
-            });
-          },
-        },
-      }
-    },
     data: {
       toolGroups: [{
         title: "公众号-程序员阿诺",
         background: "pink",
         tools: [{
           url: "https://qjyoung.github.io/",
-          name: "扫码关注&nbsp;<img src=\"./qrcode.png\" alt=\"公众号：程序员阿诺\" style=\"width: 90px;height: 90px\"/>",
+          name: '扫码关注&nbsp;<img src="./qrcode.png" alt="公众号：程序员阿诺" style="width: 90px;height: 90px"/>',
         },
           {url: 'https://github.com/qjyoung', name: 'github'},
           {url: '', name: ''},
@@ -247,34 +178,47 @@
           {url: 'http://www.jq22.com/webqd5122', name: 'css-input'},
           {url: 'https://www.processon.com/', name: 'processon'},
           {url: 'http://www.txttool.com/WenBen_Sort4.asp', name: '在线字典排序'},
+          {url: 'https://wantwords.net/', name: 'wantwords'},
         ]
       }],
       countdown: {
         title: "倒计时",
         background: "FFE56F",
         type: type_countdown,
-        today: '',
+        date: new Date(),
+        lunar: new Lunar(new Date()),
+        time: '',
+        festivals: '',
         tools: [{
           date: "xxxx-09-16",
           desc: "公历生日",
           custom: true
         }, {
-          lunarDate: "xxxx-八-十二",
           isLunar: true,
-          date: "xxxx-09-16",
+          date: "xxxx-八-十二",
           desc: "农历生日",
           custom: true
         }]
-      }
+      },
+      holidays: [],
+      name: "程序员阿诺",
+      url: "https://qjyoung.github.io",
+      date: "09-16",
+      desc: "八月十二",
+      descWidth: 0,
+      diffWidth: 0
     },
     mounted() {
-      // this.checkHolidays();
       let doc = this.toolGroups[0];
       this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
       this.toolGroups[0] = doc;
-      this.countdown = this.getFromLocal("countdown", this.countdown);
-      this.reloadCountDown();
-      setInterval(this.reloadCountDown, 1000 * 60 * 5);
+
+      this.countdown.tools = this.getFromLocal("countdown", this.countdown).tools.filter(item => {
+        return item.custom
+      });
+
+      this.updateTime();
+      setInterval(this.updateTime, 1000);
     },
     methods: {
       getFromLocal(key, field) {
@@ -284,89 +228,197 @@
         }
         return field;
       },
-      reloadCountDown() {
-        this.checkHolidays();
+      newGroup(previousGroup) {
+        this.toolGroups.splice(this.toolGroups.indexOf(previousGroup) + 1, 0, {
+          title: "请输入标题",
+          custom: true,
+          background: colors[Math.ceil(Math.random() * colors.length)],
+          tools: []
+        });
+      },
+      newItem(group) {
+        let date = '', isLunar = false;
+        let year = 'xxxx', month = 'xx', day = '';
+        if (this.desc === undefined || this.desc.length === 0) {
+          alert("blank description");
+          return;
+        }
+        if (/[\u4E00-\u9FA5]/.test(this.date)) {
+          isLunar = true;
+          let strings = this.date.split("年");
+          if (strings.length > 2) {
+            alert("error date");
+            return;
+          }
+          if (strings.length === 2) {
+            year = strings[0] === '' ? year : strings[0];
+          }
+          if (year !== 'xxxx' && parseInt(year) > 2050) {
+            alert("year must less than 2050");
+            return;
+          }
+          if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
+            alert("error year");
+            return;
+          }
 
-        this.countdown.today = `<span style="font-size:14pt;text-align:center;float: left;height:156px;width: 150px;border:2px solid #0da0ec;"> ${getDate(new Date())} </span>`;
+          strings = strings[strings.length - 1].split("月");
+          if (strings.length > 2) {
+            alert("error month");
+            return;
+          }
+
+          if (strings.length === 2) {
+            month = strings[0] === '' ? month : strings[0];
+            let _month = month;
+            if (_month !== 'xx') {
+              _month = _month.replace('闰', '');
+              if (_month.length > 2) {
+                alert("error month");
+                return;
+              }
+              if (_month.length === 2 && _month[0] !== '十') {
+                alert("error month");
+                return;
+              }
+              if (XXXUnits.indexOf(_month[_month.length - 1]) < 0) {
+                alert("error month");
+                return;
+              }
+            }
+          }
+          day = strings[strings.length - 1];
+        } else {
+          let strings = this.date.split('-');
+          let length = strings.length;
+          if (length > 3 || length === 0) {
+            alert("error date");
+            return;
+          }
+          day = strings[length - 1];
+          if (length > 1) {
+            month = strings[length - 2];
+          }
+          if (length > 2) {
+            year = strings[length - 3];
+          }
+          if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
+            alert("error year");
+            return;
+          }
+          if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
+            alert("error month")
+            return
+          }
+          if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
+            alert("error day")
+            return
+          }
+        }
+        group.tools.push({
+          date: [year, month, day].join('-'),
+          isLunar: isLunar,
+          desc: this.desc,
+          url: undefined,
+          custom: true
+        });
+      },
+      updateTime() {
+        let now = new Date();
+        this.countdown.time = [this.paddingLeft(now.getHours()), this.paddingLeft(now.getMinutes()), this.paddingLeft(now.getSeconds())].join(':');
+
+        let today = now.getDate();
+        if (localStorage.getItem("today") === today + "") {
+          return
+        }
+        this.reloadCountDown();
+        localStorage.setItem("today", today);
+      },
+      reloadCountDown() {
+        this.findHolidays();
 
         let tools = this.countdown.tools;
-        let today = new Date();
-        let year = today.getFullYear();
-        let month = today.getMonth();
-        let day = today.getDate();
-        today = new Date(year, month, day);
-        month += 1;
+        let todayDate = new Date();
+        let thisYear = todayDate.getFullYear();
+        let thisMonth = todayDate.getMonth();
+        let thisDay = todayDate.getDate();
+        todayDate = new Date(thisYear, thisMonth, thisDay);
+        thisMonth += 1;
+
         let lastDiff = 0;
+        let myDays = [];
+        let maxDescWidth = 0, maxDiffWidth = 0;
         for (let i = 0; i < tools.length; i++) {
           let item = tools[i];
           if (!item.date) {
-            tools[i] = {
-              custom: item.custom || false,
-              diff: lastDiff + 0.00001
-            };
+            item.diff = lastDiff + 0.00001;
             continue
           }
-          let strings = item.isLunar ? item.lunarDate.split('-') : item.date.split('-');
-          let _year = strings[0], _month = strings[1], _day = strings[2];
-          _year = _year === 'xxxx' ? year : _year;
-          if ('xx' === _month) {
-            _month = month;
-            if (day >= parseInt(_day)) {
-              if (month === 12 && strings[0] === 'xxxx') {
-                _year = year + 1;
-                _month = 1;
-              } else {
-                _month = month + 1;
-              }
-            }
-          }
-          let date, name;
-          if (item.isLunar) {
-            let yearBeginTime = new Date(_year, today.getMonth(), 1).getTime();
-            let found = false;
-            for (let j = 0; j < 366; j++) {
-              let theDate = new Date(yearBeginTime + 86400000 * j);
-              let lunar = new Lunar(theDate);
-              if (lunar.chineseMonth === _month && lunar.chineseDay === _day) {
-                found = true;
-                date = lunar.dateString;
-                name = lunar.dateString.replace(year + "-", "") + ' ';
-                name += lunar.chineseMonth + '月' + lunar.chineseDay;
-                break
-              }
-            }
 
+          let strings = item.isLunar && item.lunarDate ? item.lunarDate.split('-') : item.date.split('-');
+          let autoYear = strings[0] === 'xxxx', autoMonth = strings[1] === 'xx';
+          let thatYear = autoYear ? thisYear : parseInt(strings[0]);
+          let thatMonth = strings[1], thatDay = strings[2];
+
+          let thatDate, name = '', hide = false;
+          if (item.isLunar) {
+            let found = false;
+            this.find(lunar => {
+              if ((lunar.chineseMonth === thatMonth || autoMonth) && lunar.chineseDay === thatDay) {
+                found = true;
+                thatDate = new Date(lunar.date.getFullYear(), lunar.date.getMonth(), lunar.date.getDate());
+                if (item.isLunar) {
+                  name += ' ' + lunar.chineseMonth + '月' + lunar.chineseDay;
+                }
+              }
+              return found
+            }, !autoYear && thatYear > thisYear ? thatYear : undefined);
             if (!found) {
-              if (strings[0] !== 'xxxx') {
+              if (!autoYear) {
                 tools.splice(i, 1);
                 i--;
+                continue;
               }
-              // TODO show hide
-              continue;
+              item.hide = true;
             }
           } else {
-            date = [_year, _month, _day].join('-');
-            name = date.replace(year + "-", "");
+            thatDay = parseInt(thatDay);
+            if (autoMonth) {
+              thatMonth = thisMonth;
+              if (thisDay > thatDay && (autoYear || thisMonth !== 12)) {
+                thatMonth = (thisMonth + 1) % 12;
+                thatYear = thisYear + (thatMonth === 1 ? 1 : 0);
+              }
+            } else {
+              thatMonth = parseInt(thatMonth);
+              if (autoYear && (thisMonth > thatMonth || thisMonth === thatMonth && thisDay > thatDay)) {
+                thatYear += 1;
+              }
+            }
+            thatDate = new Date(thatYear, thatMonth - 1, thatDay);
           }
-          let diff = (new Date(date).getTime() - today.getTime()) / 1000 / 3600 / 24;
-          if (diff < 0) {
+
+          let diff = (thatDate - todayDate) / 86400000;
+          if (diff === 0) {
+            if (item.custom) {
+              myDays.push(item.desc);
+            }
+          } else if (diff < 0 && !item.hide) {
             tools.splice(i, 1);
             i--;
-            continue
+            continue;
           }
-          lastDiff = diff;
 
-          name = name.replace(_year + "年", '');
-          tools[i] = {
-            date: item.date,
-            lunarDate: item.isLunar ? item.lunarDate : '',
-            isLunar: item.isLunar,
-            desc: item.desc,
-            custom: item.custom || false,
-            diff: diff,
-            name: name + "\t<strong style='color: black'>" + item.desc + "</strong>\t" + Math.floor(diff) + "天"
-          };
+          let descWidth = `<strong>${item.desc}</strong>`.visualLength();
+          maxDescWidth = descWidth > maxDescWidth ? descWidth : maxDescWidth;
+          let diffWidth = (diff + '天').visualLength() + 1;
+          maxDiffWidth = diffWidth > maxDiffWidth ? diffWidth : maxDiffWidth;
+
+          item.diff = lastDiff = diff;
+          item.time = this.formatDate(thatDate).replace(thisYear + "-", "") + name;
         }
+        this.descWidth = maxDescWidth;
+        this.diffWidth = maxDiffWidth;
         tools.sort(function (a, b) {
           let res = a.custom - b.custom;
           if (res !== 0) {
@@ -375,40 +427,49 @@
           return a.diff - b.diff;
         });
         localStorage.setItem("countdown", JSON.stringify(this.countdown));
-      },
-      checkHolidays() {
-        let this0 = this;
-        let today = new Date();
-        let date = today.getDate();
-        // let localDate = localStorage.getItem("date");
-        // if (date !== undefined && localDate === date + "") {
-        //   return
-        // }
-        let holidays = [];
 
-        let yearBeginTime = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+        this.countdown.date = todayDate;
+        this.countdown.lunar = new Lunar(todayDate);
+        let _festivals = festivals(this.countdown.lunar);
+        if (_festivals.length > 0) {
+          _festivals.map(value => myDays.push(value.festival.replace('*', '')));
+        }
+        this.countdown.festivals = myDays.join(' ');
+      },
+      formatDate(date) {
+        return [date.getFullYear(), this.paddingLeft(date.getMonth() + 1), this.paddingLeft(date.getDate())].join('-');
+      },
+      paddingLeft(num) {
+        num = parseInt(num);
+        return num < 10 ? '0' + num : num;
+      },
+      find(consume, year) {
+        let date = year ? new Date(year, 0, 1) : new Date();
         for (let j = 0; j < 366; j++) {
-          let theDate = new Date(yearBeginTime + 86400000 * j);
-          let lunar = new Lunar(theDate);
-          let _festivals = festivals(lunar)
-          _festivals.forEach(value => {
-            if (value.festival.indexOf("*") > 0) {
-              holidays.push({
-                date: lunar.dateString,
-                lunarDate: ['xxxx', lunar.chineseMonth, lunar.chineseDay].join('-'),
-                isLunar: value.isLunar,
-                desc: value.festival.replace('*', '')
+          let lunar = new Lunar(date);
+          if (consume(lunar)) {
+            break
+          }
+          date.setDate(date.getDate() + 1);
+        }
+      },
+      findHolidays() {
+        this.holidays = [];
+        let todayDate = new Date();
+        let thisYear = todayDate.getFullYear();
+        todayDate = new Date(thisYear, todayDate.getMonth(), todayDate.getDate());
+        this.find(lunar => {
+          festivals(lunar).forEach(each => {
+            if (each.festival.indexOf("*") > 0) {
+              this.holidays.push({
+                custom: false,
+                time: this.formatDate(lunar.date).replace(thisYear + "-", '') + ' ' + lunar.chineseMonth + '月' + lunar.chineseDay,
+                desc: each.festival.replace('*', ''),
+                diff: (new Date(lunar.date.getFullYear(), lunar.date.getMonth(), lunar.date.getDate()) - todayDate) / 86400000
               });
             }
           })
-        }
-        holidays.push({})
-
-        let tools = this0.countdown.tools.filter(item => {
-          return item.custom
-        })
-        this0.countdown.tools = [...tools, ...holidays];
-        localStorage.setItem("date", date);
+        });
       },
     },
     watch: {

@@ -25,9 +25,6 @@ class Lunar {
     this.solarYear = _date.getFullYear();
     this.solarMonth = _date.getMonth();
     this.solarDay = _date.getDate();
-    let monthString = this.solarMonth + 1 + '';
-    let solarDay = this.solarDay + '';
-    this.dateString = [this.solarYear, monthString.length === 1 ? '0' + monthString : monthString, solarDay.length === 1 ? '0' + solarDay : solarDay].join('-');
 
     let date = new Date(this.solarYear, this.solarMonth, this.solarDay)
     if (this.solarDay >= 31) {

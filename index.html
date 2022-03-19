@@ -1,191 +1,125 @@
 <html>
 <head>
-    <meta name='viewport'
-          content='width = device-width,initial-scale = 1,minimum-scale = 1, maximum-scale = 1, user-scalable = no'/>
+    <meta name='viewport' content='width = device-width,initial-scale = 1,minimum-scale = 1, maximum-scale = 1, user-scalable = no'/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <meta name="keywords" content="程序员阿诺,阿诺,倒计时,倒计时列表,实用小工具,高考倒计时,春节,春节倒计时"/>
     <title>公众号：程序员阿诺</title>
-    <style>
-        body {
-            margin: 0 auto;
-            padding: 50px 0 300px 0;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-            background: url(./2379.min.jpeg) no-repeat; /*background: url(http://pic.qjyoung.top/2379.min.jpeg) no-repeat;*/
-        }
-
-        @media (min-width: 768px) {
-            body {
-                width: 100%;
-                background-size: 100% 100%;
-            }
-
-            .wrap {
-                margin-left: 200px;
-            }
-        }
-
-        @media (max-width: 767px) {
-            body {
-                width: 1700px;
-                background-size: 1700px 100%;
-            }
-
-            .wrap {
-                margin-left: 27px;
-            }
-        }
-
-        #date {
-            width: 210px;
-        }
-
-        span, input, button {
-            margin: 8px 25px;
-        }
-
-        input, button {
-            font-size: 20px;
-        }
-
-        a:link, a:visited, a:active {
-            text-decoration: none;
-            color: blue;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <style> body {margin: 0 auto;padding: 50px 0 300px 0;font-family: Tahoma, Verdana, Arial, sans-serif;background: url(./2379.min.jpeg) no-repeat; /*background: url(http://pic.qjyoung.top/2379.min.jpeg) no-repeat;*/}  @media (min-width: 768px) {  body {width: 100%;background-size: 100% 100%;}  .wrap {margin-left: 200px;}  }  @media (max-width: 767px) {  body {width: 1700px;background-size: 1700px 100%;}  .wrap {margin-left: 27px;}  }  table, input, button {margin: 5px 10px;font-size: 20px;}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}</style>
     <script src="x.js"></script>
+    <script src="vue.min.js"></script>
 </head>
 
 <body>
-<div class="wrap">
-    <h1></h1>
-    <!--
-        <pre>
-                               .::::.
-                             .::::::::.
-                            :::::::::::
-                         ..:::::::::::'
-                      '::::::::::::'
-                        .::::::::::
-                   '::::::::::::::..
-                        ..::::::::::::.
-                      ``::::::::::::::::
-                       ::::``:::::::::'        .:::.
-                      ::::'   ':::::'       .::::::::.
-                    .::::'      ::::     .:::::::'::::.
-                   .:::'       :::::  .:::::::::' ':::::.
-                  .::'        :::::.:::::::::'      ':::::.
-                 .::'         ::::::::::::::'         ``::::.
-             ...:::           ::::::::::::'              ``::.
-            ```` ':.          ':::::::::'                  ::::..
-                               '.:::::'                    ':'````..
-
-
-                    码中自有黄金屋              码中自有颜如玉
-        </pre>
-    -->
-
-    <!-- <p><a target="_blank" href="https://pan.baidu.com/ s/1EU5zvfudPUKNnXiUldAukA"><strong style="font-size: 33px; margin:10px">浪</strong><strong style="font-size: 30px; margin:10px">浪</strong><strong style="font-size: 15px; margin:10px">浪</strong><strong style="font-size: 20px; margin:10px">浪</strong><strong style="font-size: 10px; margin:10px">浪</strong><strong style="font-size: 28px; margin:10px">浪</strong><strong style="font-size: 25px; margin:10px">浪</strong><strong style="font-size: 22px; margin:10px">浪</strong><strong style="font-size: 18px; margin:10px">浪</strong>~<strong style="font-size: 13px; margin:10px">在</strong><strong style="font-size: 50px; margin:10px">西藏</strong></a></p> -->
-    <!--    <p><a target="_blank" href="http://test.qiaojianyong.top/">3d轨迹（加载较慢）</a></p>-->
+<div class="wrap" id="app">
+    <!-- <p><a target="_blank" href="https://pan.baidu.com/s/1EU5zvfudPUKNnXiUldAukA"><strong style="font-size: 33px; margin:10px">浪</strong><strong style="font-size: 30px; margin:10px">浪</strong><strong style="font-size: 15px; margin:10px">浪</strong><strong style="font-size: 20px; margin:10px">浪</strong><strong style="font-size: 10px; margin:10px">浪</strong><strong style="font-size: 28px; margin:10px">浪</strong><strong style="font-size: 25px; margin:10px">浪</strong><strong style="font-size: 22px; margin:10px">浪</strong><strong style="font-size: 18px; margin:10px">浪</strong>~<strong style="font-size: 13px; margin:10px">在</strong><strong style="font-size: 50px; margin:10px">西藏</strong></a></p> -->
+    <!-- <p><a target="_blank" href="http://test.qiaojianyong.top/">3d轨迹（加载较慢）</a></p>-->
     <p><a target="_blank" href="https://v.qq.com/x/page/n0536o6npn5.html">318视频</a></p>
     <p><a target="_blank" href="318/altitude-line.html">318海拔-2d</a></p>
     <p><a target="_blank" href="318/altitude-3d.html">318经纬海拔-3d</a></p>
     <p><a target="_blank" href="318/track/index.html">318-3d轨迹</a></p>
-    <p>
-        <span>日期&nbsp;&nbsp;&nbsp;</span><input id="date"/>
-        <button onclick="now(1)">now()</button>
-        <button onclick="now(3)">日期 &gt; (ms, s)</button>
-        <br>
-        <span>时间戳(ms)</span><input id="timestamp"/>
-        <button onclick="now(2)">(ms) &gt; 日期</button>
-        <br>
-        <span>时间戳(s)</span><input id="timestamp_s"/>
-        <button onclick="now(21)">(s) &gt; 日期</button>
-        <br>
-    </p>
-    <p><a target="_blank" href="./tools-board.html">公众号</a><br><br></p>
-    <p><a target="_blank" href="./format/index.htm">JSON-格式化</a></p>
-    <p><a target="_blank" href="http://tool.oschina.net/codeformat/xml">其他代码格式化</a></p>
-    <p><a target="_blank" href="http://cron.qqe2.com/">在线Cron表达式生成器</a></p>
-    <p><a target="_blank" href="http://tool.chinaz.com/tools/unicode.aspx">Unicode编码</a></p>
-    <p><a target="_blank" href="http://www.bejson.com/xml2json/">XML 2 JSON</a></p>
-    <p><a target="_blank" href="./json2bean/index.html">JSON 2 BEAN</a></p>
-    <p><a target="_blank" href="./encrypt/encrypt.html">AES-DES</a></p>
-    <p><a target="_blank" href="http://tool.chacuo.net/cryptaes">AES-2</a></p>
-    <p><a target="_blank" href="./encrypt/encrypt2.html">哈希散列</a></p>
-    <p><a target="_blank" href="https://tool.lu/hexconvert/">进制转换</a></p>
-    <p><a target="_blank" href="./encrypt/encrypt3.html">BASE64编码</a></p>
-    <p><a target="_blank" href="https://c.runoob.com/front-end/59/">BASE64编码</a></p>
-    <p><a target="_blank" href="https://cli.im/">二维码生成器</a></p>
-    <p><a target="_blank" href="http://www.jq22.com/textDifference">Show diff</a></p>
-
-    <p><a target="_blank" href="http://tool.oschina.net/jscompress/">js/css compresss</a></p>
-    <p><a target="_blank" href="./encrypt/encrypt4.html">图片转base64</a></p>
-    <p><a target="_blank" href="http://imgbase64.duoshitong.com/">图片 base64 互转</a></p>
-    <p><a target="_blank" href="https://www.ip.cn">IP 域名地址查询</a></p>
-    <p><a target="_blank" href="https://github.com/qjyoung">qjyoung's github</a></p>
-    <p><a target="_blank" href="https://blog.csdn.net/qq_33303700">qjyoung's CSDN</a></p>
-    <p><a target="_blank" href="https://www.bootcdn.cn/">稳定、快速、免费的前端开源项目 CDN 加速服务</a></p>
-    <p><a target="_blank" href="http://www.yuangongju.com/css3button">css-button</a></p>
-    <p><a target="_blank" href="http://www.jq22.com/webqd5122">css-input</a></p>
-
-    <p><a target="_blank" href="https://www.processon.com/">processon</a></p>
-    <p><a target="_blank" href="http://www.txttool.com/WenBen_Sort4.asp">在线字典排序</a></p>
+    <table>
+        <tr>
+            <td>日期:</td>
+            <td>
+                <input v-model="dateString"/>
+                <button @click="date = new Date()">now()</button>
+            </td>
+        </tr>
+        <tr>
+            <td>毫秒:</td>
+            <td><input v-model="timestamp"/></td>
+        </tr>
+        <tr>
+            <td>秒:</td>
+            <td><input v-model="second"/></td>
+        </tr>
+    </table>
+    <template v-for="link in links">
+        <p><a target="_blank" :href="link.url">{{link.name}}</a></p>
+    </template>
 </div>
 <script>
-  window.onload = function () {
-    now(1);
-  };
-
-  function now(n) {
-    let date;
-    let timestamp;
-    let dateInput = document.getElementById("date");
-    let timestampInput = document.getElementById("timestamp");
-    let timestampInput_s = document.getElementById("timestamp_s");
-    switch (n) {
-      case 1:
-        date = new Date();
-        timestamp = date.getTime();
-        dateInput.value = formatTimestamp(timestamp);
-        timestampInput.value = timestamp;
-        timestampInput_s.value = parseInt(timestamp / 1000);
-        break;
-      case 2:
-        timestamp = timestampInput.value;
-        dateInput.value = formatTimestamp(timestamp);
-        timestampInput_s.value = parseInt(timestamp / 1000);
-        break;
-      case 21:
-        timestamp = timestampInput_s.value;
-        dateInput.value = formatTimestamp(timestamp * 1000);
-        timestampInput.value = timestamp * 1000;
-        break;
-      case 3:
-        date = new Date(dateInput.value);
-        timestampInput.value = date.getTime();
-        timestampInput_s.value = parseInt(date.getTime() / 1000);
-        break;
+  new Vue({
+    el: '#app',
+    data: {
+      date: null,
+      dateString: '',
+      timestamp: 0,
+      second: 0,
+      links: [
+        {url: "./tools-board.html", name: "公众号"},
+        {url: "./tools-board.html", name: "倒计时列表"},
+        {url: "./format/index.htm", name: "JSON-格式化"},
+        {url: "http://tool.oschina.net/codeformat/xml", name: "其他代码格式化"},
+        {url: "http://cron.qqe2.com/", name: "在线Cron表达式生成器"},
+        {url: "http://tool.chinaz.com/tools/unicode.aspx", name: "Unicode编码"},
+        {url: "http://www.bejson.com/xml2json/", name: "XML 2 JSON"},
+        {url: "./json2bean/index.html", name: "JSON 2 BEAN"},
+        {url: "./encrypt/encrypt.html", name: "AES-DES"},
+        {url: "http://tool.chacuo.net/cryptaes", name: "AES-2"},
+        {url: "./encrypt/encrypt2.html", name: "哈希散列"},
+        {url: "https://tool.lu/hexconvert/", name: "进制转换"},
+        {url: "./encrypt/encrypt3.html", name: "BASE64编码"},
+        {url: "https://c.runoob.com/front-end/59/", name: "BASE64编码-2"},
+        {url: "https://cli.im/", name: "二维码生成器"},
+        {url: "http://www.jq22.com/textDifference", name: "Show diff"},
+        {url: "http://tool.oschina.net/jscompress/", name: "js/css compress"},
+        {url: "./encrypt/encrypt4.html", name: "图片转base64"},
+        {url: "http://imgbase64.duoshitong.com/", name: "图片 base64 互转"},
+        {url: "https://www.ip.cn", name: "IP 域名地址查询"},
+        {url: "https://github.com/qjyoung", name: "qjyoung's github"},
+        {url: "https://blog.csdn.net/qq_33303700", name: "qjyoung's CSDN"},
+        {url: "https://www.bootcdn.cn/", name: "开源项目 CDN 加速服务"},
+        {url: "http://www.yuangongju.com/css3button", name: "css-button"},
+        {url: "http://www.jq22.com/webqd5122", name: "css-input"},
+        {url: "https://www.processon.com/", name: "process-on"},
+        {url: "http://www.txttool.com/WenBen_Sort4.asp", name: "在线字典排序"},
+        {url: "https://wantwords.net/", name: "wantwords"},
+      ]
+    },
+    mounted() {
+      this.date = new Date();
+    },
+    methods: {
+      formatNumber(num) {
+        return num < 10 ? '0' + num : num;
+      },
+      formatDate(date) {
+        let Y = date.getFullYear() + '-';
+        let M = this.formatNumber(date.getMonth() + 1) + '-';
+        let D = this.formatNumber(date.getDate()) + ' ';
+        let h = this.formatNumber(date.getHours()) + ':';
+        let m = this.formatNumber(date.getMinutes()) + ':';
+        let s = this.formatNumber(date.getSeconds());
+        return Y + M + D + h + m + s;
+      }
+    },
+    watch: {
+      date(val) {
+        if (this.formatDate(new Date(this.dateString)) !== this.formatDate(val)) {
+          this.dateString = this.formatDate(val);
+        }
+        this.timestamp = this.date.getTime();
+        this.second = parseInt(this.timestamp / 1000);
+      },
+      dateString(val) {
+        if (val !== this.formatDate(this.date)) {
+          this.date = new Date(val);
+        }
+      },
+      timestamp(val) {
+        if (val !== this.date.getTime()) {
+          this.date = new Date(parseInt(val));
+        }
+      },
+      second(val) {
+        if (val !== parseInt(this.date.getTime() / 1000)) {
+          this.date = new Date(val * 1000);
+        }
+      }
     }
-  }
-
-  function formatTimestamp(timestamp) {
-    let date = new Date(parseInt(timestamp));
-    let Y = date.getFullYear() + '-';
-    let M = this.formatNumber(date.getMonth() + 1) + '-';
-    let D = this.formatNumber(date.getDate()) + ' ';
-    let h = this.formatNumber(date.getHours()) + ':';
-    let m = this.formatNumber(date.getMinutes()) + ':';
-    let s = this.formatNumber(date.getSeconds());
-    return Y + M + D + h + m + s;
-  }
-
-  function formatNumber(num) {
-    return num < 10 ? '0' + num : num;
-  }
+  });
 </script>
 
 <script src="https://eqcn.ajz.miesnfu.com/wp-content/plugins/wp-3d-pony/live2dw/lib/L2Dwidget.min.js"></script>
