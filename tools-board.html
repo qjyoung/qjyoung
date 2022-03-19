@@ -84,7 +84,7 @@
         </ol>
 
         <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
-            <input type="text" style="width: 40%" placeholder="日期" v-model="date"/>
+            <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date"/>
             <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>
             <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
         </div>
@@ -203,8 +203,8 @@
       holidays: [],
       name: "程序员阿诺",
       url: "https://qjyoung.github.io",
-      date: "09-16",
-      desc: "八月十二",
+      date: "",
+      desc: "",
       descWidth: 0,
       diffWidth: 0
     },
