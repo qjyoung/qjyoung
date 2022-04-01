@@ -11,12 +11,86 @@
     <script src="x.js"></script>
     <script src="calendar/lunar.js"></script>
     <script src="vue.min.js"></script>
+    <script src="js/bluebird.js"></script>
+    <script src="js/html2canvas.min.js"></script>
+
+    <script type="text/javascript">
+      // canvas生成图片
+      function screenshot() {
+        let getPixelRatio = function (context) { // 获取设备的PixelRatio
+          let backingStore = context.backingStorePixelRatio ||
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 0.5;
+          return (window.devicePixelRatio || 0.5) / backingStore;
+        };
+
+        let content = document.getElementById("countdown");
+        let width = content.offsetWidth;
+        let height = content.offsetHeight;
+
+        let canvas = document.createElement("canvas");
+        let context = canvas.getContext('2d');
+        let scale = getPixelRatio(context); //将canvas的容器扩大PixelRatio倍，再将画布缩放，将图像放大PixelRatio倍。
+        context.scale(scale, scale);
+
+        canvas.width = width * scale;
+        canvas.height = height * scale;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+
+        let opts = {
+          scale: scale,
+          canvas: canvas,
+          width: width,
+          height: height,
+          dpi: window.devicePixelRatio
+        };
+        html2canvas(content, opts).then(function (canvas) {
+          context.imageSmoothingEnabled = false;
+          context.webkitImageSmoothingEnabled = false;
+          context.msImageSmoothingEnabled = false;
+          context.imageSmoothingEnabled = false;
+          let dataURI = canvas.toDataURL('image/jpeg', 1.0);
+          dataURIToBlob("我的倒计时.jpg", dataURI, callback);
+        });
+      }
+
+      // edited from https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
+      let dataURIToBlob = function (imgName, dataURI, callback) {
+        let binStr = atob(dataURI.split(',')[1]),
+          len = binStr.length,
+          arr = new Uint8Array(len);
+
+        for (let i = 0; i < len; i++) {
+          arr[i] = binStr.charCodeAt(i);
+        }
+
+        callback(imgName, new Blob([arr]));
+      }
+
+      let callback = function (imgName, blob) {
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = imgName;
+        a.onclick = function () {
+          if (navigator.msSaveBlob) {
+            return navigator.msSaveBlob(blob, imgName);
+          }
+        };
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      };
+    </script>
 </head>
 <body>
 <span id="ruler" style="position:absolute;visibility: hidden;"></span>
 <script !src="">
   String.prototype.visualLength = function () {
-    var ruler = document.getElementById('ruler');
+    let ruler = document.getElementById('ruler');
     ruler.innerHTML = this;
     return ruler.offsetWidth;
   }
@@ -48,8 +122,8 @@
             </div>
         </div>
     </div>
-    <div class="board item" style="backgroundColor:FFE56F">
-        <h1>倒计时</h1>
+    <div class="board item" style="backgroundColor:FFE56F" id="countdown" onclick="screenshot()">
+        <h1>倒计时（点击截图）</h1>
         <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
             <span v-html="formatDate(countdown.date)"></span><br>
             <span v-html="weekday(countdown.date)"></span>
