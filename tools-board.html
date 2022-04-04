@@ -122,8 +122,8 @@
             </div>
         </div>
     </div>
-    <div class="board item" style="backgroundColor:FFE56F" id="countdown" onclick="screenshot()">
-        <h1>倒计时（点击截图）</h1>
+    <div class="board item" style="backgroundColor:FFE56F" id="countdown">
+        <h1 onclick="screenshot()">倒计时（点击截图）</h1>
         <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
             <span v-html="formatDate(countdown.date)"></span><br>
             <span v-html="weekday(countdown.date)"></span>
