@@ -10,7 +10,7 @@
     </style>
     <script src="x.js"></script>
     <script src="calendar/lunar.js"></script>
-    <script src="vue.min.js"></script>
+    <script src="js/vue.min.js"></script>
     <script src="js/bluebird.js"></script>
     <script src="js/html2canvas.min.js"></script>
 
@@ -84,44 +84,16 @@
         a.click();
         document.body.removeChild(a);
       };
+      String.prototype.visualLength = function () {
+        let ruler = document.getElementById('ruler');
+        ruler.innerHTML = this;
+        return ruler.offsetWidth;
+      }
     </script>
 </head>
 <body>
 <span id="ruler" style="position:absolute;visibility: hidden;"></span>
-<script !src="">
-  String.prototype.visualLength = function () {
-    let ruler = document.getElementById('ruler');
-    ruler.innerHTML = this;
-    return ruler.offsetWidth;
-  }
-</script>
 <div id="app" style="width:100%;height: 100%;">
-    <div>
-        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in toolGroups">
-            <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
-                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
-            </h1>
-            <ol style="margin-bottom: 22px">
-                <template v-for="tool in group.tools">
-                    <li class="item" style="padding-right: 2px">
-                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
-                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
-                    </li>
-                </template>
-            </ol>
-            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
-                <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>
-                <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>
-                <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
-            </div>
-            <div class="badge up item-x" v-if="group.custom">
-                <span class="my-button" @click="toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
-            </div>
-            <div class="badge down item-x">
-                <span class="my-button" @click="newGroup(group)">➕</span>
-            </div>
-        </div>
-    </div>
     <div class="board item" style="backgroundColor:FFE56F" id="countdown">
         <h1 onclick="screenshot()">倒计时（点击截图）</h1>
         <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
@@ -161,6 +133,33 @@
             <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date"/>
             <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>
             <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
+        </div>
+    </div>
+
+    <div>
+        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in toolGroups">
+            <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
+                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
+            </h1>
+            <ol style="margin-bottom: 22px">
+                <template v-for="tool in group.tools">
+                    <li class="item" style="padding-right: 2px">
+                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
+                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
+                    </li>
+                </template>
+            </ol>
+            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
+                <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>
+                <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>
+                <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
+            </div>
+            <div class="badge up item-x" v-if="group.custom">
+                <span class="my-button" @click="toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
+            </div>
+            <div class="badge down item-x">
+                <span class="my-button" @click="newGroup(group)">➕</span>
+            </div>
         </div>
     </div>
 </div>
@@ -226,6 +225,7 @@
           {url: '.', name: '主页'},
           {url: './calendar', name: '万年历'},
           {url: './format', name: 'JSON-格式化'},
+          {url: "./security_password.html", name: "复杂密码生成器"},
           {url: 'http://tool.oschina.net/codeformat/xml', name: '其他代码格式化'},
           {url: 'http://cron.qqe2.com/', name: '在线Cron表达式生成器'},
           {url: 'http://tool.chinaz.com/tools/unicode.aspx', name: 'Unicode编码'},
@@ -311,7 +311,7 @@
         });
       },
       newItem(group) {
-        let date = '', isLunar = false;
+        let isLunar = false;
         let year = 'xxxx', month = 'xx', day = '';
         if (this.desc === undefined || this.desc.length === 0) {
           alert("blank description");
