@@ -436,6 +436,7 @@
           let thatMonth = strings[1], thatDay = strings[2];
 
           let thatDate, name = '';
+          item.hide = false;
           if (item.isLunar) {
             let found = false;
             this.find(lunar => {
@@ -519,9 +520,10 @@
         num = parseInt(num);
         return num < 10 ? '0' + num : num;
       },
-      find(consume, year) {
+      find(consume, year, findDays) {
+        findDays = findDays || 386;
         let date = year ? new Date(year, 0, 1) : new Date();
-        for (let j = 0; j < 366; j++) {
+        for (let j = 0; j < findDays; j++) {
           let lunar = new Lunar(date);
           if (consume(lunar)) {
             break
