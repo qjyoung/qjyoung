@@ -435,7 +435,7 @@
           let thatYear = autoYear ? thisYear : parseInt(strings[0]);
           let thatMonth = strings[1], thatDay = strings[2];
 
-          let thatDate, name = '', hide = false;
+          let thatDate, name = '';
           if (item.isLunar) {
             let found = false;
             this.find(lunar => {
@@ -473,24 +473,25 @@
             thatDate = new Date(thatYear, thatMonth - 1, thatDay);
           }
 
-          let diff = (thatDate - todayDate) / 86400000;
-          if (diff === 0) {
-            if (item.custom) {
+          if (!item.hide) {
+            let diff = (thatDate - todayDate) / 86400000;
+            if (diff === 0 && item.custom) {
               myDays.push(item.desc);
+            } else if (diff < 0) {
+              tools.splice(i, 1);
+              i--;
+              continue;
             }
-          } else if (diff < 0 && !item.hide) {
-            tools.splice(i, 1);
-            i--;
-            continue;
+            let descWidth = `<strong>${item.desc}</strong>`.visualLength();
+            maxDescWidth = descWidth > maxDescWidth ? descWidth : maxDescWidth;
+            let diffWidth = (diff + '天').visualLength() + 1;
+            maxDiffWidth = diffWidth > maxDiffWidth ? diffWidth : maxDiffWidth;
+
+            item.diff = lastDiff = diff;
+            item.time = this.formatDate(thatDate).replace(thisYear + "-", "") + name;
+          } else {
+            item.diff = 0;
           }
-
-          let descWidth = `<strong>${item.desc}</strong>`.visualLength();
-          maxDescWidth = descWidth > maxDescWidth ? descWidth : maxDescWidth;
-          let diffWidth = (diff + '天').visualLength() + 1;
-          maxDiffWidth = diffWidth > maxDiffWidth ? diffWidth : maxDiffWidth;
-
-          item.diff = lastDiff = diff;
-          item.time = this.formatDate(thatDate).replace(thisYear + "-", "") + name;
         }
         this.countdown.descWidth = maxDescWidth;
         this.countdown.diffWidth = maxDiffWidth;
