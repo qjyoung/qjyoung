@@ -183,6 +183,7 @@
           {url: 'https://mp.weixin.qq.com/s/QaU5B0m4Oo-hhIigu10ehg', name: '北疆2872公里之旅'},
           {url: 'https://mp.weixin.qq.com/s/HARgAEd3G36cMgioiwA04A', name: '西藏，魂归之地'},
           {url: '', name: ''},
+          {url: 'https://mp.weixin.qq.com/s/32WFce0eQHZacG26k6D-Iw', name: '让以太坊geth支持hardhat console日志'},
           {url: 'https://mp.weixin.qq.com/s/ts-B-W2sj7ciaz9L7pfmDw', name: '从一次JVM内存泄露说起'},
           {url: 'https://mp.weixin.qq.com/s/51b7n81DxyRjVoyyi2U-tA', name: '用vue写一个傻瓜式倒计时列表'},
           {url: 'https://mp.weixin.qq.com/s/UhyQ5lnaqfV0i-O90OEQEw', name: 'git补丁的妙用，将代码差异化发布到外网github'},
@@ -538,11 +539,13 @@
         todayDate = new Date(thisYear, todayDate.getMonth(), todayDate.getDate());
         this.find(lunar => {
           festivals(lunar).forEach(each => {
-            if (each.festival.indexOf("*") > 0) {
+            let isHoliday = each.festival.indexOf("*") > 0;
+            let isKeyDay = each.festival.indexOf(".") > 0;
+            if (isHoliday || isKeyDay) {
               this.holidays.push({
                 custom: false,
                 time: this.formatDate(lunar.date).replace(thisYear + "-", '') + ' ' + lunar.chineseMonth + '月' + lunar.chineseDay,
-                desc: each.festival.replace('*', ''),
+                desc: `<span style="background-color:${isHoliday ? '#ccffcc' : ''}">${each.festival.replace('*', '').replace('.', '')}</span>`,
                 diff: (new Date(lunar.date.getFullYear(), lunar.date.getMonth(), lunar.date.getDate()) - todayDate) / 86400000
               });
             }
