@@ -6,15 +6,26 @@
     <meta name="keywords" content="程序员阿诺,阿诺,倒计时,倒计时列表,实用小工具,高考倒计时,春节,春节倒计时"/>
     <title>公众号：程序员阿诺</title>
     <style>
-        body {font-family: Tahoma, Verdana, Arial, sans-serif;}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}  td {padding-left: 5px;}
+        body {font-family: Tahoma, Verdana, Arial, sans-serif;}  .notice {background: #B4EEB4;position: fixed;border: 1px solid #1a1a1a;border-radius: 5px;z-index: 100;width: auto;height: 30px;text-align: center;font-weight: bold;line-height: 30px;padding: 7px;left: 50%;top: 27%;transform: translate(-50%, -50%);}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}  td {padding-left: 5px;}
     </style>
     <script src="x.js"></script>
-    <script src="calendar/lunar.js"></script>
+    <script src="calendar/lunar.js?1"></script>
     <script src="js/vue.min.js"></script>
     <script src="js/bluebird.js"></script>
     <script src="js/html2canvas.min.js"></script>
 
     <script type="text/javascript">
+      let noticeLayer = document.createElement("div");
+      noticeLayer.id = "noticeLayer";
+      noticeLayer.setAttribute('class', 'notice');
+      function notice(date) {
+        if (document.getElementById("noticeLayer") == null) {
+          document.body.appendChild(noticeLayer);
+          noticeLayer.innerHTML = date;
+          setTimeout("document.body.removeChild(noticeLayer)", 1313)
+        }
+      }
+
       // canvas生成图片
       function screenshot() {
         let getPixelRatio = function (context) { // 获取设备的PixelRatio
@@ -53,37 +64,23 @@
           context.webkitImageSmoothingEnabled = false;
           context.msImageSmoothingEnabled = false;
           context.imageSmoothingEnabled = false;
-          let dataURI = canvas.toDataURL('image/jpeg', 1.0);
-          dataURIToBlob("我的倒计时.jpg", dataURI, callback);
+          canvas.toBlob(async blob => {
+            const data = [
+              new ClipboardItem({
+                [blob.type]: blob,
+              }),
+            ];
+            await navigator.clipboard.write(data)
+              .then(() => {
+                  notice('截图已复制到剪切板');
+                }, () => {
+                  notice('截图失败');
+                }
+              );
+          });
         });
       }
 
-      // edited from https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob#Polyfill
-      let dataURIToBlob = function (imgName, dataURI, callback) {
-        let binStr = atob(dataURI.split(',')[1]),
-          len = binStr.length,
-          arr = new Uint8Array(len);
-
-        for (let i = 0; i < len; i++) {
-          arr[i] = binStr.charCodeAt(i);
-        }
-
-        callback(imgName, new Blob([arr]));
-      }
-
-      let callback = function (imgName, blob) {
-        let a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = imgName;
-        a.onclick = function () {
-          if (navigator.msSaveBlob) {
-            return navigator.msSaveBlob(blob, imgName);
-          }
-        };
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      };
       String.prototype.visualLength = function () {
         let ruler = document.getElementById('ruler');
         ruler.innerHTML = this;
@@ -253,6 +250,7 @@
           {url: 'https://www.processon.com/', name: 'processon'},
           {url: 'http://www.txttool.com/WenBen_Sort4.asp', name: '在线字典排序'},
           {url: 'https://wantwords.net/', name: 'wantwords'},
+          {url: 'https://tool.ip138.com/rgbhex/', name: '在线颜色值转换'},
         ]
       }],
       countdown: {
@@ -316,31 +314,31 @@
         let isLunar = false;
         let year = 'xxxx', month = 'xx', day = '';
         if (this.desc === undefined || this.desc.length === 0) {
-          alert("blank description");
+          notice("请填写描述");
           return;
         }
         if (/[\u4E00-\u9FA5]/.test(this.date)) {
           isLunar = true;
           let strings = this.date.split("年");
           if (strings.length > 2) {
-            alert("error date");
+            notice("日期错误");
             return;
           }
           if (strings.length === 2) {
             year = strings[0] === '' ? year : strings[0];
           }
           if (year !== 'xxxx' && parseInt(year) > 2050) {
-            alert("year must less than 2050");
+            notice("最大支持年份2050");
             return;
           }
           if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
-            alert("error year");
+            notice("年份错误");
             return;
           }
 
           strings = strings[strings.length - 1].split("月");
           if (strings.length > 2) {
-            alert("error month");
+            notice("月份错误");
             return;
           }
 
@@ -349,16 +347,10 @@
             let _month = month;
             if (_month !== 'xx') {
               _month = _month.replace('闰', '');
-              if (_month.length > 2) {
-                alert("error month");
-                return;
-              }
-              if (_month.length === 2 && _month[0] !== '十') {
-                alert("error month");
-                return;
-              }
-              if (XXXUnits.indexOf(_month[_month.length - 1]) < 0) {
-                alert("error month");
+              if (_month.length > 2
+                || (_month.length === 2 && _month[0] !== '十')
+                || (XXXUnits.indexOf(_month[_month.length - 1]) < 0)) {
+                notice("月份错误");
                 return;
               }
             }
@@ -368,7 +360,7 @@
           let strings = this.date.split('-');
           let length = strings.length;
           if (length > 3 || length === 0) {
-            alert("error date");
+            notice("日期错误");
             return;
           }
           day = strings[length - 1];
@@ -379,15 +371,15 @@
             year = strings[length - 3];
           }
           if (!/^xxxx$|^[1-9]\d{3}$/.test(year)) {
-            alert("error year");
+            notice("年份错误");
             return;
           }
           if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
-            alert("error month")
+            notice("月份错误");
             return
           }
           if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
-            alert("error day")
+            notice("日期错误");
             return
           }
         }
