@@ -118,7 +118,7 @@
                     </span>
                     <span style="display:inline-block;" :style="{width:countdown.diffWidth+'px',color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
                     <span v-html="tool.time"></span>
-                    <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm('确定删除？')||countdown.tools.splice(countdown.tools.indexOf(tool),1)">❌</span>
+                    <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.desc}]？`)||countdown.tools.splice(countdown.tools.indexOf(tool),1)">❌</span>
                 </li>
             </template>
         </ol>
@@ -139,7 +139,7 @@
                 <template v-for="tool in group.tools">
                     <li class="item" style="padding-right: 2px">
                         <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
-                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm('确定删除？')||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
+                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
                     </li>
                 </template>
             </ol>
@@ -149,7 +149,7 @@
                 <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
             </div>
             <div class="badge up item-x" v-if="group.custom">
-                <span class="my-button" @click="!confirm('确定删除？')||toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
+                <span class="my-button" @click="!confirm(`确定删除[${group.title}]？`)||toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
             </div>
             <div class="badge down item-x">
                 <span class="my-button" @click="newGroup(group)">➕</span>
