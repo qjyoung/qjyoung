@@ -88,6 +88,7 @@
 <body>
 <span id="ruler" style="position:absolute;visibility: hidden;"></span>
 <div id="app" style="width:100%;height: 100%;">
+    <!--countdown-->
     <div class="board item" style="backgroundColor:#fedf55" id="countdown">
         <h1 onclick="screenshot()">倒计时（点击截图）</h1>
         <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
@@ -124,28 +125,39 @@
         </ol>
 
         <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
-            <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date"/>
-            <input type="text" style="width: 40%" placeholder="描述" v-model="desc"/>
-            <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
+            <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date" @keyup.enter="newItem(countdown)"/>
+            <input type="text" style="width: 40%" placeholder="描述(回车新增)" v-model="desc" @keyup.enter="newItem(countdown)"/>
+            <span class="my-button" style="position: absolute;margin-left: 3px">✅</span>
         </div>
     </div>
 
+    <!--tools-board-->
     <div>
-        <div class="board item" :style="{backgroundColor:group.background}" v-for="group in toolGroups">
+        <div class="board item"
+             :style="{backgroundColor:group.background}"
+             v-for="group in toolGroups"
+             draggable="true"
+             @dragstart="dragging(group)"
+             @drop="drop(true, group, null)"
+             @dragover.prevent>
             <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
                 <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
             </h1>
             <ol style="margin-bottom: 22px">
                 <template v-for="tool in group.tools">
-                    <li class="item" style="padding-right: 2px">
+                    <li class="item" style="padding-right: 2px"
+                        draggable="true"
+                        @dragstart.stop="dragging( tool)"
+                        @drop.stop="drop(false, group, tool)"
+                        @dragover.prevent>
                         <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
                         <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
                     </li>
                 </template>
             </ol>
             <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
-                <input type="text" style="width: 40%" placeholder="链接" v-model="url"/>
-                <input type="text" style="width: 40%" placeholder="名称" v-model="name"/>
+                <input type="text" style="width: 40%" placeholder="链接" v-model="url" @keyup.enter="group.tools.push({name: name || '空',url: url,custom: true})"/>
+                <input type="text" style="width: 40%" placeholder="名称(回车新增)" v-model="name" @keyup.enter="group.tools.push({name: name || '空',url: url,custom: true})"/>
                 <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
             </div>
             <div class="badge up item-x" v-if="group.custom">
@@ -162,6 +174,7 @@
   let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
   new Vue({
     el: '#app',
+    draggingEle: null,
     data: {
       toolGroups: [{
         title: "公众号-程序员阿诺",
@@ -306,6 +319,28 @@
           background: colors[Math.ceil(Math.random() * colors.length)],
           tools: []
         });
+      },
+      dragging( ele) {
+        this.draggingEle = ele;
+      },
+      drop(isGroup, group, item) {
+        let data = this.toolGroups;
+        let promptName = group.title;
+        let target = group;
+        if (!isGroup) {
+          data = group.tools;
+          promptName = item.name;
+          target = item;
+        }
+        let myIndex = data.indexOf(this.draggingEle);
+        if (myIndex >= 0) {
+          let targetIndex = data.indexOf(target);
+          myIndex !== targetIndex
+          && confirm(`确定移动到[${promptName}]之${myIndex > targetIndex ? '前' : '后'}?`)
+          && data.splice(myIndex, 1)
+          && data.splice(targetIndex, 0, this.draggingEle);
+        }
+        this.draggingEle = null;
       },
       newItem(group) {
         let isLunar = false;
