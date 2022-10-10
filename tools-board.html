@@ -303,6 +303,34 @@
 
       this.updateTime();
       setInterval(this.updateTime, 1000);
+
+      setTimeout(() => {
+        let _version = "1";
+        let version = localStorage.getItem("version");
+        if (!version || version !== _version) {
+          confirm(`⭐工具面板&倒计时列表⭐️
+此工具面板可方便分类收纳工作中常用的在线工具或参考资料
+
+如下所示，不同色块代表了不同的工具组（简称组），每组可有若干子条目
+鼠标移动到不同色块区域（组）即可唤出各自的操作按钮和输入框
+
+使用指南：
+① 每组右下角➕按钮，可在该组后追增新工具组
+② 每组右上角❌按钮，可将该组删除，同时组内所有条目都将被移除
+③ 每组的标题都可实时编辑，只需要移动光标到相应位置
+
+子条目操作：
+④ 按输入框提示，正确输入数据后回车或点击✅按钮即可新增子条目
+⑤ 每个子条目右侧同样有❌按钮，可将该条目删除
+
+⑥ 工具组及其子条目都可自由拖拽移动位置，重新排序，目前子条目暂不能跨组移动
+
+⑦ 倒计时列表同理，不可移动
+
+点击确认下次打开将不再提示🌹谢谢
+          `) && localStorage.setItem("version", _version);
+        }
+      }, 133)
     },
     methods: {
       getFromLocal(key, field) {
@@ -320,17 +348,22 @@
           tools: []
         });
       },
-      dragging( ele) {
+      dragging(ele) {
         this.draggingEle = ele;
       },
       drop(isGroup, group, item) {
         let data = this.toolGroups;
         let promptName = group.title;
         let target = group;
+        if (!group.custom) {
+          return;
+        }
         if (!isGroup) {
           data = group.tools;
           promptName = item.name;
           target = item;
+        } else if (!this.draggingEle.custom) {
+          return;
         }
         let myIndex = data.indexOf(this.draggingEle);
         if (myIndex >= 0) {
