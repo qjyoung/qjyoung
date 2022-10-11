@@ -138,7 +138,7 @@
              v-for="group in toolGroups"
              draggable="true"
              @dragstart="dragging(group)"
-             @drop="drop(true, group, null)"
+             @drop="drop(group)"
              @dragover.prevent>
             <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
                 <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
@@ -147,8 +147,8 @@
                 <template v-for="tool in group.tools">
                     <li class="item" style="padding-right: 2px"
                         draggable="true"
-                        @dragstart.stop="dragging( tool)"
-                        @drop.stop="drop(false, group, tool)"
+                        @dragstart.stop="dragging(group, tool)"
+                        @drop.stop="drop(group, tool)"
                         @dragover.prevent>
                         <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
                         <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
@@ -174,7 +174,8 @@
   let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
   new Vue({
     el: '#app',
-    draggingEle: null,
+    draggingGroup: null,
+    draggingItem: null,
     data: {
       toolGroups: [{
         title: "公众号-程序员阿诺",
@@ -305,10 +306,11 @@
       setInterval(this.updateTime, 1000);
 
       setTimeout(() => {
-        let _version = "1";
+        let _version = "2";
         let version = localStorage.getItem("version");
         if (!version || version !== _version) {
           confirm(`⭐工具面板&倒计时列表⭐️
+
 此工具面板可方便分类收纳工作中常用的在线工具或参考资料
 
 如下所示，不同色块代表了不同的工具组（简称组），每组可有若干子条目
@@ -323,11 +325,13 @@
 ④ 按输入框提示，正确输入数据后回车或点击✅按钮即可新增子条目
 ⑤ 每个子条目右侧同样有❌按钮，可将该条目删除
 
-⑥ 工具组及其子条目都可自由拖拽移动位置，重新排序，目前子条目暂不能跨组移动
+⑥ 工具组及其子条目都可自由拖拽变换位置，重新排序，子条目可跨组移动
 
 ⑦ 倒计时列表同理，不可移动
 
-点击确认下次打开将不再提示🌹谢谢
+点击确认下次打开将不再提示
+
+🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹
           `) && localStorage.setItem("version", _version);
         }
       }, 133)
@@ -348,32 +352,39 @@
           tools: []
         });
       },
-      dragging(ele) {
-        this.draggingEle = ele;
+      dragging(group, item) {
+        this.draggingGroup = group;
+        this.draggingItem = item;
       },
-      drop(isGroup, group, item) {
-        let data = this.toolGroups;
-        let promptName = group.title;
-        let target = group;
-        if (!group.custom) {
+      drop(targetGroup, targetItem) {
+        if (!this.draggingGroup.custom || !targetGroup.custom) {
           return;
         }
-        if (!isGroup) {
-          data = group.tools;
-          promptName = item.name;
-          target = item;
-        } else if (!this.draggingEle.custom) {
-          return;
+
+        let fromData = this.toolGroups;
+        let targetData = this.toolGroups;
+        let promptName = targetGroup.title;
+        let target = targetGroup;
+        let draggingEle = this.draggingGroup;
+
+        if (this.draggingItem) {
+          fromData = this.draggingGroup.tools;
+          targetData = targetGroup.tools;
+          draggingEle = this.draggingItem;
+          promptName = targetItem.name;
+          target = targetItem;
         }
-        let myIndex = data.indexOf(this.draggingEle);
-        if (myIndex >= 0) {
-          let targetIndex = data.indexOf(target);
-          myIndex !== targetIndex
-          && confirm(`确定移动到[${promptName}]之${myIndex > targetIndex ? '前' : '后'}?`)
-          && data.splice(myIndex, 1)
-          && data.splice(targetIndex, 0, this.draggingEle);
-        }
-        this.draggingEle = null;
+
+        let originIndex = targetData.indexOf(draggingEle);
+        let targetIndex = targetData.indexOf(target);
+        console.log(originIndex, targetIndex);
+        originIndex !== targetIndex
+        && confirm(`确定移动到[${promptName}]之${originIndex > targetIndex ? '前' : '后'}?`)
+        && fromData.splice(fromData.indexOf(draggingEle), 1)
+        && targetData.splice(originIndex > 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
+
+        this.draggingGroup = null;
+        this.draggingItem = null;
       },
       newItem(group) {
         let isLunar = false;
