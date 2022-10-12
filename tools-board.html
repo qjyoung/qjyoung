@@ -127,7 +127,7 @@
         <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
             <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date" @keyup.enter="newItem(countdown)"/>
             <input type="text" style="width: 40%" placeholder="描述(回车新增)" v-model="desc" @keyup.enter="newItem(countdown)"/>
-            <span class="my-button" style="position: absolute;margin-left: 3px">✅</span>
+            <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
         </div>
     </div>
 
