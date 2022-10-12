@@ -381,7 +381,7 @@
         originIndex !== targetIndex
         && confirm(`确定移动到[${promptName}]之${originIndex > targetIndex ? '前' : '后'}?`)
         && fromData.splice(fromData.indexOf(draggingEle), 1)
-        && targetData.splice(originIndex > 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
+        && targetData.splice(originIndex >= 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
 
         this.draggingGroup = null;
         this.draggingItem = null;
