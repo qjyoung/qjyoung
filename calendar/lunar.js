@@ -92,7 +92,23 @@ class Lunar {
     this.day = Math.round(days + 1); // TODO
 
     this.chineseYear = this.cyclical(this.year - XXXBaseYear + 36);
-    this.chineseMonth = (this.isLeap ? '闰' : '') + (this.month > 10 ? '十' + XXXUnits[this.month - 10] : XXXUnits[this.month]);
+    switch (this.month) {
+      case 1:
+        this.chineseMonth = "正";
+        break;
+      case 10:
+        this.chineseMonth = "十";
+        break;
+      case 11:
+        this.chineseMonth = "冬";
+        break;
+      case 12:
+        this.chineseMonth = "腊";
+        break;
+      default:
+        this.chineseMonth = XXXUnits[this.month];
+    }
+    this.chineseMonth = (this.isLeap ? '闰' : '') + this.chineseMonth;
     switch (this.day) {
       case 10:
         this.chineseDay = '初十';

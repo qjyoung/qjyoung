@@ -9,7 +9,7 @@
         body {font-family: Tahoma, Verdana, Arial, sans-serif;}  .notice {background: #B4EEB4;position: fixed;border: 1px solid #1a1a1a;border-radius: 5px;z-index: 100;width: auto;height: 30px;text-align: center;font-weight: bold;line-height: 30px;padding: 7px;left: 50%;top: 27%;transform: translate(-50%, -50%);}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}  td {padding-left: 5px;}
     </style>
     <script src="x.js"></script>
-    <script src="calendar/lunar.js?1"></script>
+    <script src="calendar/lunar.js?2"></script>
     <script src="js/vue.min.js"></script>
     <script src="js/bluebird.js"></script>
     <script src="js/html2canvas.min.js"></script>
@@ -90,7 +90,7 @@
 <div id="app" style="width:100%;height: 100%;">
     <!--countdown-->
     <div class="board item" style="backgroundColor:#fedf55" id="countdown">
-        <h1 onclick="screenshot()">倒计时（点击截图）</h1>
+        <h1 onclick="screenshot()">倒计时</h1>
         <div style="padding-left: 20px;width: auto;height: auto; font-size:14pt;text-align:center;border:2px solid #0da0ec;">
             <span v-html="formatDate(countdown.date)"></span><br>
             <span v-html="weekday(countdown.date)"></span>
@@ -327,7 +327,9 @@
 
 ⑥ 工具组及其子条目都可自由拖拽移动位置，子条目支持跨组移动
 
-⑦ 倒计时列表同理，不可移动
+⑦ 倒计时列表同理，不可移动。点击标题可获取倒计时列表截图
+
+⑧ 重中之重🎯🎯🎯此工具是一个纯本地工具，您添加的任何数据都只保存在本地！请放心使用
 
 点击确认下次打开不再提示
 
@@ -420,7 +422,7 @@
 
           strings = strings[strings.length - 1].split("月");
           if (strings.length > 2) {
-            notice("月份错误");
+            notice("农历月份错误");
             return;
           }
 
@@ -429,10 +431,13 @@
             let _month = month;
             if (_month !== 'xx') {
               _month = _month.replace('闰', '');
-              if (_month.length > 2
-                || (_month.length === 2 && _month[0] !== '十')
-                || (XXXUnits.indexOf(_month[_month.length - 1]) < 0)) {
-                notice("月份错误");
+              if (_month.length > 1
+                || _month[0] === '一'
+                || XXXUnits.indexOf(_month[0]) < 0
+                && _month[0] !== '正'
+                && _month[0] !== '冬'
+                && _month[0] !== '腊') {
+                notice("农历月份错误(正月二月...十月冬月腊月)");
                 return;
               }
             }
@@ -457,7 +462,7 @@
             return;
           }
           if (!/^xx$|^1[0-2]$|^0?[1-9]$/.test(month)) {
-            notice("月份错误");
+            notice("公历月份错误");
             return
           }
           if (!/^(0?[1-9]$|^[1-2][0-9]$|^3[0-1]$)/.test(day)) {
