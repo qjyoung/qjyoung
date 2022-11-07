@@ -589,7 +589,7 @@
         this.countdown.lunar = new Lunar(todayDate);
         let _festivals = festivals(this.countdown.lunar);
         if (_festivals.length > 0) {
-          _festivals.map(value => myDays.push(value.festival.replace('*', '')));
+          _festivals.map(value => myDays.push(value.festival.replace('*', '').replace('.', '')));
         }
         this.countdown.festivals = myDays.join(' ');
       },
