@@ -185,18 +185,14 @@ function festivals(lunar) {
 
   // 节气
   let utc = XXXBaseYearUtc + XXXMillisecondsOfAYear * (lunar.solarYear - XXXBaseYear);
-  if (new Date(utc + XXXSolarTermsInfo2[lunar.solarMonth * 2 + 1]).getUTCDate() === lunar.solarDay) {
-    festivals.push({
-      festival: XXXSolarTerms[lunar.solarMonth * 2 + 1],
-      isLunar: true
-    })
-  }
-  if (new Date(utc + XXXSolarTermsInfo2[lunar.solarMonth * 2]).getUTCDate() === lunar.solarDay) {
-    festivals.push({
-      festival: XXXSolarTerms[lunar.solarMonth * 2],
-      isLunar: true
-    })
-  }
+  [lunar.solarMonth * 2 + 1, lunar.solarMonth * 2].forEach(index => {
+    if (new Date(utc + XXXSolarTermsInfo2[index]).getUTCDate() === lunar.solarDay) {
+      festivals.push({
+        festival: XXXSolarTerms[index],
+        isLunar: true
+      })
+    }
+  })
   return festivals;
 }
 
