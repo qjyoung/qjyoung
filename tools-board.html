@@ -11,7 +11,7 @@
     <script src="x.js"></script>
     <script src="calendar/lunar.js?3"></script>
     <script src="js/vue.min.js"></script>
-    <script src="js/bluebird.js"></script>
+    <script src="js/bluebird.min.js"></script>
     <script src="js/html2canvas.min.js"></script>
 
     <script type="text/javascript">
@@ -95,39 +95,30 @@
             <span v-html="formatDate(countdown.date)"></span><br>
             <span v-html="weekday(countdown.date)"></span>
             <span style="color: black; ">{{countdown.time}}</span><br>
-            <span style="color: violet; ">{{`${countdown.lunar.chineseYear}【${countdown.lunar.animal}】年 ${countdown.lunar.cyclical(countdown.lunar.months)}月 ${countdown.lunar.cyclical(countdown.lunar.days+1)}日`}}</span><br>
+            <span style="color: violet; ">{{`${countdown.lunar.chineseYear}【${countdown.lunar.animal}】年 ${countdown.lunar.cyclical(countdown.lunar.months)}月 ${countdown.lunar.cyclical(countdown.lunar.days + 1)}日`}}</span><br>
             <span style="color: #000066; ">{{`${countdown.lunar.chineseMonth}月${countdown.lunar.chineseDay}`}}</span><br>
-            <span style="background-color:#ccffcc; color:#000066">{{countdown.festivals}}</span>
+            <span style="background-color:#ccffcc; color:#000066">{{countdown._festivals.join('、')}}</span>
         </div>
-        <ol>
-            <template v-for="tool in holidays">
-                <li>
-                    <span style="width: 48px;display: inline-block">
-                        <strong style='color: black' v-html="tool.desc"></strong>
+        <template v-for="each in [holidays, countdown.tools]">
+            <ol style="margin-bottom: 22px">
+                <template v-for="item in each">
+                    <li class="item" v-if="!item.hide">
+                    <span style="display:inline-block;" :style="[item.descStyle]">
+                        <strong style='color: black' v-html="item.desc"></strong>
                     </span>
-                    <span style="width: 43px;display: inline-block;" :style="{color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
-                    <span v-html="tool.time"></span>
-                </li>
-            </template>
-        </ol>
-
-        <ol style="margin-bottom: 22px">
-            <template v-for="tool in countdown.tools">
-                <li class="item" v-if="!tool.hide">
-                    <span style="display:inline-block;" :style="{width:countdown.descWidth+'px'}">
-                        <strong style='color: black' v-html="tool.desc"></strong>
-                    </span>
-                    <span style="display:inline-block;" :style="{width:countdown.diffWidth+'px',color: tool.diff === 0?'red':'blue'}">{{tool.diff === 0 ? '今天' : tool.diff + '天'}}</span>
-                    <span v-html="tool.time"></span>
-                    <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.desc}]？`)||countdown.tools.splice(countdown.tools.indexOf(tool),1)">❌</span>
-                </li>
-            </template>
-        </ol>
+                        <span style="display:inline-block;" :style="[item.diffStyle]">{{item.diffShow}}</span>
+                        <span v-html="item.time"></span>
+                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="item.custom"
+                              @click="!confirm(`确定删除[${item.desc}]？`)||countdown.tools.splice(countdown.tools.indexOf(item),1)">❌</span>
+                    </li>
+                </template>
+            </ol>
+        </template>
 
         <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
-            <input type="text" style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date" @keyup.enter="newItem(countdown)"/>
-            <input type="text" style="width: 40%" placeholder="描述(回车新增)" v-model="desc" @keyup.enter="newItem(countdown)"/>
-            <span class="my-button" style="position: absolute;margin-left: 3px" @click="newItem(countdown)">✅</span>
+            <input style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date" @keyup.enter="newCountdown()"/>
+            <input style="width: 40%" placeholder="描述(回车新增)" v-model="desc" @keyup.enter="newCountdown()"/>
+            <span class="my-button" style="position: absolute;margin-left: 3px" @click="newCountdown()">✅</span>
         </div>
     </div>
 
@@ -140,7 +131,8 @@
              @dragstart="dragging(group)"
              @drop="drop(group)"
              @dragover.prevent>
-            <h1 v-bind:class="!group.custom?'':'title'">{{group.title===""?"请输入标题":group.title}}
+            <h1 v-bind:class="!group.custom?'':'title'">
+                {{group.title === "" ? "请输入标题" : group.title}}
                 <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
             </h1>
             <ol style="margin-bottom: 22px">
@@ -151,17 +143,19 @@
                         @drop.stop="drop(group, tool)"
                         @dragover.prevent>
                         <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
-                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom" @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
+                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom"
+                              @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
                     </li>
                 </template>
             </ol>
             <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
-                <input type="text" style="width: 40%" placeholder="链接" v-model="url" @keyup.enter="group.tools.push({name: name || '空',url: url,custom: true})"/>
-                <input type="text" style="width: 40%" placeholder="名称(回车新增)" v-model="name" @keyup.enter="group.tools.push({name: name || '空',url: url,custom: true})"/>
-                <span class="my-button" style="position: absolute;margin-left: 3px" @click="group.tools.push({name: name || '空',url: url,custom: true})">✅</span>
+                <input style="width: 40%" placeholder="链接" v-model="url" @keyup.enter="newTool(group)"/>
+                <input style="width: 40%" placeholder="名称(回车新增)" v-model="name" @keyup.enter="newTool(group)"/>
+                <span class="my-button" style="position: absolute;margin-left: 3px" @click="newTool(group)">✅</span>
             </div>
             <div class="badge up item-x" v-if="group.custom">
-                <span class="my-button" @click="!confirm(`确定删除[${group.title}]？`)||toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
+                <span class="my-button"
+                      @click="!confirm(`确定删除[${group.title}]？`)||toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
             </div>
             <div class="badge down item-x">
                 <span class="my-button" @click="newGroup(group)">➕</span>
@@ -270,10 +264,8 @@
         date: new Date(),
         lunar: new Lunar(new Date()),
         time: '',
+        today: -1,
         _festivals: [],
-        festivals: '',
-        descWidth: 0,
-        diffWidth: 0,
         tools: [{
           date: "xxxx-09-16",
           desc: "公历生日",
@@ -289,28 +281,9 @@
       name: "程序员阿诺",
       url: "https://qjyoung.github.io",
       date: "",
-      desc: ""
-    },
-    mounted() {
-      let doc = this.toolGroups[0];
-      this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
-      this.toolGroups[0] = doc;
-
-      this.countdown.tools = this.getFromLocal("countdown", this.countdown).tools.filter(item => {
-        return item.custom
-      });
-
-      this.findHolidays();
-      this.reloadCountDown();
-
-      this.updateTime();
-      setInterval(this.updateTime, 1000);
-
-      setTimeout(() => {
-        let _version = "2";
-        let version = localStorage.getItem("version");
-        if (!version || version !== _version) {
-          confirm(`⭐工具板&倒计时列表⭐️
+      desc: "",
+      version: "2",
+      readme: `⭐工具板&倒计时列表⭐️
 
 此工具板可方便分类收纳工作中常用的在线工具或参考资料链接
 
@@ -328,14 +301,33 @@
 
 ⑥ 工具组及其子条目都可自由拖拽移动位置，子条目支持跨组移动
 
-⑦ 倒计时列表同理，不可移动。点击标题可获取倒计时列表截图
+⑦ 倒计时列表同理，不可移动。在电脑上点击标题可获取倒计时列表截图
 
 ⑧ 🎯🎯🎯此工具是一个纯本地工具，所有新增数据都只保存在本地，放心使用
 
 点击确认下次打开不再提示
 
 🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹🌹
-          `) && localStorage.setItem("version", _version);
+          `
+    },
+    mounted() {
+      let doc = this.toolGroups[0];
+      this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
+      this.toolGroups[0] = doc;
+
+      this.countdown.tools = this.getFromLocal("countdown", this.countdown).tools.filter(item => {
+        return item.custom
+      });
+
+      this.reloadCountDown();
+
+      this.updateTime();
+      setInterval(this.updateTime, 1000);
+
+      setTimeout(() => {
+        let version = localStorage.getItem("version");
+        if (!version || version !== this.version) {
+          confirm(this.readme) && localStorage.setItem("version", this.version);
         }
       }, 133)
     },
@@ -346,6 +338,16 @@
           return cache;
         }
         return field;
+      },
+      updateTime() {
+        let now = new Date();
+        this.countdown.time = [this.paddingLeft(now.getHours()), this.paddingLeft(now.getMinutes()), this.paddingLeft(now.getSeconds())].join(':');
+        let today = now.getDate();
+        if (this.countdown.today === today) {
+          return
+        }
+        this.reloadCountDown();
+        this.countdown.today = today;
       },
       newGroup(previousGroup) {
         let base = 138, max = 255 - base;
@@ -361,40 +363,10 @@
           tools: []
         });
       },
-      dragging(group, item) {
-        this.draggingGroup = group;
-        this.draggingItem = item;
+      newTool(group) {
+        group.tools.push({name: this.name || '', url: this.url, custom: true})
       },
-      drop(targetGroup, targetItem) {
-        if (!this.draggingGroup.custom || !targetGroup.custom) {
-          return;
-        }
-
-        let fromData = this.toolGroups;
-        let targetData = this.toolGroups;
-        let promptName = targetGroup.title;
-        let target = targetGroup;
-        let draggingEle = this.draggingGroup;
-
-        if (this.draggingItem) {
-          fromData = this.draggingGroup.tools;
-          targetData = targetGroup.tools;
-          draggingEle = this.draggingItem;
-          promptName = targetItem.name;
-          target = targetItem;
-        }
-
-        let originIndex = targetData.indexOf(draggingEle);
-        let targetIndex = targetData.indexOf(target);
-        originIndex !== targetIndex
-        && confirm(`确定移动到[${promptName}]之${originIndex > targetIndex ? '前' : '后'}?`)
-        && fromData.splice(fromData.indexOf(draggingEle), 1)
-        && targetData.splice(originIndex >= 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
-
-        this.draggingGroup = null;
-        this.draggingItem = null;
-      },
-      newItem(group) {
+      newCountdown() {
         let isLunar = false;
         let year = 'xxxx', month = 'xx', day = '';
         if (this.desc === undefined || this.desc.length === 0) {
@@ -470,7 +442,7 @@
             return
           }
         }
-        group.tools.push({
+        this.countdown.tools.push({
           date: [year, month, day].join('-'),
           isLunar: isLunar,
           desc: this.desc,
@@ -478,33 +450,29 @@
           custom: true
         });
       },
-      updateTime() {
-        let now = new Date();
-        this.countdown.time = [this.paddingLeft(now.getHours()), this.paddingLeft(now.getMinutes()), this.paddingLeft(now.getSeconds())].join(':');
-
-        let today = now.getDate();
-        if (localStorage.getItem("today") === today + "") {
-          return
-        }
-        this.reloadCountDown();
-        localStorage.setItem("today", today);
-      },
       reloadCountDown() {
-        this.countdown._festivals = [];
-        this.findHolidays();
-
-        let tools = this.countdown.tools;
+        let items = this.countdown.tools;
         let todayDate = new Date();
         let thisYear = todayDate.getFullYear();
         let thisMonth = todayDate.getMonth();
         let thisDay = todayDate.getDate();
         todayDate = new Date(thisYear, thisMonth, thisDay);
+        this.countdown.date = todayDate;
+        this.countdown.lunar = new Lunar(todayDate);
+
+        this.countdown._festivals = [];
+        let _festivals = festivals(this.countdown.lunar);
+        if (_festivals.length > 0) {
+          _festivals.map(value => this.countdown._festivals.push(value.festival.replace('*', '').replace('.', '')));
+        }
+        this.findHolidays();
+
         thisMonth += 1;
 
         let lastDiff = 0;
         let maxDescWidth = 0, maxDiffWidth = 0;
-        for (let i = 0; i < tools.length; i++) {
-          let item = tools[i];
+        for (let i = 0; i < items.length; i++) {
+          let item = items[i];
           if (!item.date) {
             item.diff = lastDiff + 0.00001;
             continue
@@ -531,7 +499,7 @@
             }, !autoYear && thatYear > thisYear ? thatYear : undefined);
             if (!found) {
               if (!autoYear) {
-                tools.splice(i, 1);
+                items.splice(i, 1);
                 i--;
                 continue;
               }
@@ -555,17 +523,17 @@
           }
 
           if (!item.hide) {
-            let diff = (thatDate - todayDate) / 86400000;
+            let diff = this.calDiff(thatDate);
             if (diff === 0 && item.custom) {
               this.countdown._festivals.push(item.desc);
             } else if (diff < 0) {
-              tools.splice(i, 1);
+              items.splice(i, 1);
               i--;
               continue;
             }
             let descWidth = `<strong>${item.desc}</strong>`.visualLength();
             maxDescWidth = descWidth > maxDescWidth ? descWidth : maxDescWidth;
-            let diffWidth = (diff + '天').visualLength() + 1;
+            let diffWidth = (diff + '天').visualLength();
             maxDiffWidth = diffWidth > maxDiffWidth ? diffWidth : maxDiffWidth;
 
             item.diff = lastDiff = diff;
@@ -574,48 +542,12 @@
             item.diff = 0;
           }
         }
-        this.countdown.descWidth = maxDescWidth;
-        this.countdown.diffWidth = maxDiffWidth;
-        tools.sort(function (a, b) {
-          let res = a.custom - b.custom;
-          if (res !== 0) {
-            return res;
-          }
-          return a.diff - b.diff;
-        });
+        this.sortAndSetStyle(items, maxDiffWidth + 1, maxDescWidth + 1);
         localStorage.setItem("countdown", JSON.stringify(this.countdown));
-
-        this.countdown.date = todayDate;
-        this.countdown.lunar = new Lunar(todayDate);
-        let _festivals = festivals(this.countdown.lunar);
-        if (_festivals.length > 0) {
-          _festivals.map(value => this.countdown._festivals.push(value.festival.replace('*', '').replace('.', '')));
-        }
-        this.countdown.festivals = this.countdown._festivals.join('、')
-      },
-      formatDate(date) {
-        return [date.getFullYear(), this.paddingLeft(date.getMonth() + 1), this.paddingLeft(date.getDate())].join('-');
-      },
-      paddingLeft(num) {
-        num = parseInt(num);
-        return num < 10 ? '0' + num : num;
-      },
-      find(consumer, year, findDays) {
-        findDays = findDays || 386;
-        let date = year ? new Date(year, 0, 1) : new Date();
-        for (let j = 0; j < findDays; j++) {
-          let lunar = new Lunar(date);
-          if (consumer(lunar)) {
-            break
-          }
-          date.setDate(date.getDate() + 1);
-        }
       },
       findHolidays() {
         this.holidays = [];
-        let todayDate = new Date();
-        let thisYear = todayDate.getFullYear();
-        todayDate = new Date(thisYear, todayDate.getMonth(), todayDate.getDate());
+        let thisYear = new Date().getFullYear();
         let theWinterSolsticeDay, lastWinterSolsticeDay;
         this.find(lunar => {
           festivals(lunar).forEach(each => {
@@ -630,7 +562,7 @@
                 custom: false,
                 time: this.formatDate(lunar.date).replace(thisYear + "-", '') + ' ' + lunar.chineseMonth + '月' + lunar.chineseDay,
                 desc: `<span style="background-color:${isHoliday ? '#ccffcc' : ''}">${each.festival.replace('*', '').replace('.', '')}</span>`,
-                diff: (new Date(lunar.date.getFullYear(), lunar.date.getMonth(), lunar.date.getDate()) - todayDate) / 86400000
+                diff: this.calDiff(lunar.date)
               });
             }
           })
@@ -674,17 +606,81 @@
               custom: false,
               time: this.formatDate(lunar.date).replace(thisYear + "-", '') + ' ' + lunar.chineseMonth + '月' + lunar.chineseDay,
               desc: `${XXXUnits[periodIndex + 1]}九`,
-              diff: (new Date(lunar.date.getFullYear(), lunar.date.getMonth(), lunar.date.getDate()) - todayDate) / 86400000
+              diff: this.calDiff(lunar.date)
             });
           } else {
             total++
             winterSolsticeDay = undefined;
           }
         }
-        this.holidays.sort(function (a, b) {
+        this.sortAndSetStyle(this.holidays, '365天'.visualLength() + 1, '<strong>国庆节</strong>'.visualLength() + 1);
+      },
+      dragging(group, item) {
+        this.draggingGroup = group;
+        this.draggingItem = item;
+      },
+      drop(targetGroup, targetItem) {
+        if (!this.draggingGroup.custom || !targetGroup.custom) {
+          return;
+        }
+
+        let fromData = this.toolGroups;
+        let targetData = this.toolGroups;
+        let promptName = targetGroup.title;
+        let target = targetGroup;
+        let draggingEle = this.draggingGroup;
+
+        if (this.draggingItem) {
+          fromData = this.draggingGroup.tools;
+          targetData = targetGroup.tools;
+          draggingEle = this.draggingItem;
+          promptName = targetItem.name;
+          target = targetItem;
+        }
+
+        let originIndex = targetData.indexOf(draggingEle);
+        let targetIndex = targetData.indexOf(target);
+        originIndex !== targetIndex
+        && confirm(`确定移动到[${promptName}]之${originIndex > targetIndex ? '前' : '后'}?`)
+        && fromData.splice(fromData.indexOf(draggingEle), 1)
+        && targetData.splice(originIndex >= 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
+
+        this.draggingGroup = null;
+        this.draggingItem = null;
+      },
+      find(consumer, year, findDays) {
+        findDays = findDays || 386;
+        let date = year ? new Date(year, 0, 1) : new Date();
+        for (let j = 0; j < findDays; j++) {
+          let lunar = new Lunar(date);
+          if (consumer(lunar)) {
+            break
+          }
+          date.setDate(date.getDate() + 1);
+        }
+      },
+      formatDate(date) {
+        return [date.getFullYear(), this.paddingLeft(date.getMonth() + 1), this.paddingLeft(date.getDate())].join('-');
+      },
+      paddingLeft(num) {
+        num = parseInt(num);
+        return num < 10 ? '0' + num : num;
+      },
+      calDiff(that) {
+        let today = new Date();
+        today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        return (new Date(that.getFullYear(), that.getMonth(), that.getDate()) - today) / 86400000
+      },
+      sortAndSetStyle(items, diffWidth, descWidth) {
+        items.sort(function (a, b) {
           return a.diff - b.diff;
         });
-      },
+        items.forEach(item => {
+          item.descStyle = {width: `${descWidth}px`};
+          item.diffStyle = {width: `${diffWidth}px`, color: item.diff === 0 ? 'red' : 'blue'};
+          item.diffShow = item.diff === 0 ? '今天' : item.diff + '天';
+        })
+      }
     },
     watch: {
       toolGroups: {
