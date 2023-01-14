@@ -6,36 +6,79 @@
     <meta name="keywords" content="程序员阿诺,阿诺,倒计时,倒计时列表,实用小工具,高考倒计时,春节,春节倒计时"/>
     <title>公众号：程序员阿诺</title>
     <style>
-        body {font-family: Tahoma, Verdana, Arial, sans-serif;}  .notice {background: #B4EEB4;position: fixed;border: 1px solid #1a1a1a;border-radius: 5px;z-index: 100;width: auto;height: 30px;text-align: center;font-weight: bold;line-height: 30px;padding: 7px;left: 50%;top: 27%;transform: translate(-50%, -50%);}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .title {position: relative;}  .title:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .title:hover .edit {display: block;}  td {padding-left: 5px;}
+        body {font-family: Tahoma, Verdana, Arial, sans-serif;}  .notice {background: #B4EEB4;position: fixed;border: 1px solid #1a1a1a;border-radius: 5px;z-index: 100;width: auto;height: 30px;text-align: center;font-weight: bold;line-height: 30px;padding: 7px;left: 50%;top: 27%;transform: translate(-50%, -50%);}  a:link, a:visited, a:active {text-decoration: none;color: blue;}  a:hover {text-decoration: underline;}  .board {position: relative;float: left;margin: 5px 17px 5px 17px;padding: 5px 17px 5px 17px;}  .badge {position: absolute;font-size: 17px;width: 23px;height: 23px;line-height: 23px;text-align: center;}  .up {top: -12px;right: -12px;}  .down {bottom: -12px;right: -12px;}  .my-button {position: relative;cursor: pointer;}  .my-button:active {padding-bottom: -1px;}  .item-x {display: none;}  .item:hover > .item-x, .item-x:hover {display: inline-block;}  .group-name {position: relative;}  .group-name:hover {color: transparent;}  .edit {background-color: transparent;display: none;position: absolute;top: 0;margin: 0;padding: 0;width: 100%;height: 100%;font-family: inherit;font-size: inherit;font-weight: bold;border: none;outline: none;}  .group-name:hover .edit {display: block;}  td {padding-left: 5px;}
     </style>
     <script src="x.js"></script>
-    <script src="calendar/lunar.js?3"></script>
+    <script src="calendar/lunar.js?4"></script>
     <script src="js/vue.min.js"></script>
     <script src="js/bluebird.min.js"></script>
     <script src="js/html2canvas.min.js"></script>
 
     <script type="text/javascript">
-      let noticeLayer = document.createElement("div");
-      noticeLayer.id = "noticeLayer";
-      noticeLayer.setAttribute('class', 'notice');
-      function notice(date) {
+      function notice(message, opts) {
+        function destroy() {
+          document.body.removeChild(document.getElementById("noticeLayer"));
+        }
+
+        function createBtn(parent, title, opt) {
+          let btn = document.createElement("button");
+          btn.innerText = title;
+          btn.style.margin = "2px";
+          btn.onclick = opt;
+          parent.append(btn)
+        }
+
         if (document.getElementById("noticeLayer") == null) {
+          let noticeLayer = document.createElement("div");
           document.body.appendChild(noticeLayer);
-          noticeLayer.innerHTML = date;
-          setTimeout("document.body.removeChild(noticeLayer)", 1313)
+          noticeLayer.id = "noticeLayer";
+          noticeLayer.setAttribute('class', 'notice');
+          noticeLayer.append(message);
+          if (opts) {
+            noticeLayer.style.height = '60px';
+            noticeLayer.append(document.createElement("br"));
+            opts.forEach(opt => {
+              createBtn(noticeLayer, opt.title, () => {
+                opt.handler();
+                destroy();
+              })
+            })
+            createBtn(noticeLayer, "取消", () => {
+              destroy();
+            })
+          } else {
+            setTimeout(destroy, 1313);
+          }
         }
       }
 
+      window.oncontextmenu = function (e) {
+        e.preventDefault();
+        confirm("备份?") && function () {
+          let content = localStorage.getItem(StoreKey.ToolGroups);
+          let blob = new Blob([content], {
+            type: "text/plain;charset=utf-8"
+          });
+          let reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onload = function (e) {
+            let a = document.createElement('a');
+            a.download = `工具板-${new Date().toISOString().replace("T", " ").replace(/\..*/, "")}.json`;
+            a.href = e.target.result;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        }()
+      };
       // canvas生成图片
       function screenshot() {
-        let content = document.getElementById("countdown");
+        let content = document.getElementById(StoreKey.Countdown);
         let width = content.offsetWidth;
         let height = content.offsetHeight;
 
         let canvas = document.createElement("canvas");
         let context = canvas.getContext('2d');
-        // 获取设备的PixelRatio
-        // 将canvas的容器扩大PixelRatio倍，再将画布缩放，将图像放大PixelRatio倍。
         let backingStore = context.backingStorePixelRatio ||
           context.webkitBackingStorePixelRatio ||
           context.mozBackingStorePixelRatio ||
@@ -87,6 +130,61 @@
 </head>
 <body>
 <span id="ruler" style="position:absolute;visibility: hidden;"></span>
+<template id="group">
+    <div>
+        <div :style="{backgroundColor:group.background}" class="board item">
+            <h1 v-bind:class="!group.custom?'':'group-name'">
+                {{ group.name === "" ? "请输入标题" : group.name }}
+                <input class="edit" placeholder="请输入标题" v-if="group.custom" v-model="group.name"/>
+            </h1>
+            <template v-if="group.groups">
+                <list :list="group.groups" v-slot="{item,index}">
+                    <draggable :couldplace="item.custom" :draggable="item.custom" :index="index" :item="item" :list="group.groups" :sublist="true" :type="DragType.Group">
+                        <group :group="item" :groups="group.groups"></group>
+                    </draggable>
+                </list>
+            </template>
+            <template v-else>
+                <ol style="margin-bottom: 22px">
+                    <list :list="group.tools" v-slot="{item,index}">
+                        <draggable :couldPlace="item.custom" :draggable="item.custom" :index="index" :item="item" :list="group.tools" :type="DragType.Tool">
+                            <li class="item" style="padding-right: 2px">
+                                <a :href="item.url" draggable="false" target="_blank"><span v-html="item.name"></span></a>
+                                <span @click="confirm(`确定删除[${item.name}]？`)&&(item.name=ToDelete)" class="my-button item-x"
+                                      style="position: absolute;margin-left: 1px"
+                                      v-if="item.custom">❌</span>
+                            </li>
+                        </draggable>
+                    </list>
+                </ol>
+                <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
+                    <input @keyup.enter="newTool(group)" placeholder="链接" style="width: 40%" v-model="url"/>
+                    <input @keyup.enter="newTool(group)" placeholder="名称(回车新增)" style="width: 40%" v-model="name"/>
+                    <span @click="newTool(group)" class="my-button" style="position: absolute;margin-left: 3px">✅</span>
+                </div>
+            </template>
+            <div class="badge up item-x" v-if="group.custom">
+                <span @click="confirm(`确定删除[${group.name}]？`)&&(group.name=ToDelete)" class="my-button">❌</span>
+            </div>
+            <div class="badge down item-x">
+                <span @click="newGroup(group)" class="my-button">➕</span>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="draggable">
+    <div :draggable="draggable" @dragover.prevent @dragstart="dragging(event)" @drop="drop(event)">
+        <slot></slot>
+    </div>
+</template>
+<template id="list">
+    <div>
+        <div v-for="(item,index) in list">
+            <slot v-bind:index="index" v-bind:item="item"></slot>
+        </div>
+    </div>
+</template>
 <div id="app" style="width:100%;height: 100%;">
     <!--countdown-->
     <div class="board item" style="backgroundColor:#fedf55" id="countdown">
@@ -99,21 +197,17 @@
             <span style="color: #000066; ">{{`${countdown.lunar.chineseMonth}月${countdown.lunar.chineseDay}`}}</span><br>
             <span style="background-color:#ccffcc; color:#000066">{{countdown._festivals.join('、')}}</span>
         </div>
-        <template v-for="each in [holidays, countdown.tools]">
-            <ol style="margin-bottom: 22px">
-                <template v-for="item in each">
-                    <li class="item" v-if="!item.hide">
-                    <span style="display:inline-block;" :style="[item.descStyle]">
-                        <strong style='color: black' v-html="item.desc"></strong>
-                    </span>
-                        <span style="display:inline-block;" :style="[item.diffStyle]">{{item.diffShow}}</span>
-                        <span v-html="item.time"></span>
-                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="item.custom"
-                              @click="!confirm(`确定删除[${item.desc}]？`)||countdown.tools.splice(countdown.tools.indexOf(item),1)">❌</span>
-                    </li>
-                </template>
-            </ol>
-        </template>
+        <ol style="margin-bottom: 22px" v-for="each in [holidays, countdown.tools]">
+            <li class="item" v-for="item in each" v-if="!item.hide">
+                <span :style="[item.descStyle]" style="display:inline-block;">
+                    <strong style='color: black' v-html="item.desc"></strong>
+                </span>
+                <span :style="[item.diffStyle]" style="display:inline-block;">{{item.diffShow}}</span>
+                <span v-html="item.time"></span>
+                <span @click="!confirm(`确定删除[${item.desc}]？`)||countdown.tools.splice(countdown.tools.indexOf(item),1)" class="my-button item-x" style="position: absolute;margin-left: 1px"
+                      v-if="item.custom">❌</span>
+            </li>
+        </ol>
 
         <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px">
             <input style="width: 40%" placeholder="日期(09-16或八月十二)" v-model="date" @keyup.enter="newCountdown()"/>
@@ -123,56 +217,184 @@
     </div>
 
     <!--tools-board-->
-    <div>
-        <div class="board item"
-             :style="{backgroundColor:group.background}"
-             v-for="group in toolGroups"
-             draggable="true"
-             @dragstart="dragging(group)"
-             @drop="drop(group)"
-             @dragover.prevent>
-            <h1 v-bind:class="!group.custom?'':'title'">
-                {{group.title === "" ? "请输入标题" : group.title}}
-                <input class="edit" placeholder="请输入标题" v-model="group.title" v-if="group.custom"/>
-            </h1>
-            <ol style="margin-bottom: 22px">
-                <template v-for="tool in group.tools">
-                    <li class="item" style="padding-right: 2px"
-                        draggable="true"
-                        @dragstart.stop="dragging(group, tool)"
-                        @drop.stop="drop(group, tool)"
-                        @dragover.prevent>
-                        <a :href="tool.url" target="_blank"><span v-html="tool.name"></span></a>
-                        <span class="my-button item-x" style="position: absolute;margin-left: 1px" v-if="tool.custom"
-                              @click="!confirm(`确定删除[${tool.name}]？`)||group.tools.splice(group.tools.indexOf(tool),1)">❌</span>
-                    </li>
-                </template>
-            </ol>
-            <div class="item-x" style="position: absolute;left:20px;width: 92%;bottom: 2px" v-if="group.custom">
-                <input style="width: 40%" placeholder="链接" v-model="url" @keyup.enter="newTool(group)"/>
-                <input style="width: 40%" placeholder="名称(回车新增)" v-model="name" @keyup.enter="newTool(group)"/>
-                <span class="my-button" style="position: absolute;margin-left: 3px" @click="newTool(group)">✅</span>
-            </div>
-            <div class="badge up item-x" v-if="group.custom">
-                <span class="my-button"
-                      @click="!confirm(`确定删除[${group.title}]？`)||toolGroups.splice(toolGroups.indexOf(group),1)">❌</span>
-            </div>
-            <div class="badge down item-x">
-                <span class="my-button" @click="newGroup(group)">➕</span>
-            </div>
-        </div>
-    </div>
+    <list :list="toolGroups" v-slot="{item,index}">
+        <draggable :couldplace="item.custom" :draggable="item.custom" :index="index" :item="item" :list="toolGroups" :sublist="!!item.groups" :type="DragType.Group">
+            <group :group="item" :groups="toolGroups"></group>
+        </draggable>
+    </list>
 </div>
 </body>
 <script>
+  function clone(object) {
+    let buf;
+    if (object instanceof Array) {
+      buf = [];
+      let i = object.length;
+      while (i--) {
+        buf[i] = clone(object[i]);
+      }
+      return buf;
+    } else if (object instanceof Object) {
+      buf = {};
+      for (let k in object) {
+        buf[k] = clone(object[k]);
+      }
+      return buf;
+    } else {
+      return object;
+    }
+  }
+  const DragType = {Group: 1, Tool: 2};
+  const StoreKey = {ToolGroups: "toolGroups", Countdown: "countdown", Readme: "readme", Version: "version"};
+  const ToDelete = '$delete';
+
+  let draggingType = null;
+  let draggingFromList = null;
+  let draggingItem = null;
+  let draggingIndex = null;
+
+  let draggable = {
+    props: {
+      draggable: {},
+      sublist: false,
+      type: {},
+      list: {},
+      item: {},
+      index: {},
+      couldplace: {},
+    },
+    template: '#draggable',
+    methods: {
+      clear() {
+        draggingType = null;
+        draggingFromList = null;
+        draggingItem = null;
+      },
+      dragging(event) {
+        event.stopPropagation();
+
+        draggingType = this.type;
+        draggingFromList = this.list;
+        draggingItem = this.item;
+        draggingIndex = this.index;
+      },
+      drop() {
+        if (this.couldplace && draggingType === this.type) {
+          if (draggingItem === this.item && draggingIndex === this.index) {
+            return
+          }
+          let inSameList = draggingFromList === this.list;
+          let before = inSameList && draggingIndex > this.index;
+
+          let this0 = this;
+
+          function mergeGroups() {
+            before = false;
+            let _item = clone(this0.item);
+            this0.$set(this0.item, 'name', '合并的组')
+            this0.$set(this0.item, 'custom', true)
+            this0.$set(this0.item, 'tools', []);
+            this0.$set(this0.item, 'groups', [_item, clone(draggingItem)])
+
+            let base = 138, max = 255 - base;
+            let time = new Date().getTime();
+            let r = time % max;
+            this0.$set(this0.item, 'background', r % 2 === 0 ? colors[Math.ceil(Math.random() * colors.length)]
+              : `rgb(${r + base} , ${Math.floor(Math.random() * max) + base} , ${Math.floor(Math.random() * max) + base})`)
+            return true;
+          }
+
+          let opts = [{
+            title: `移动到[${this0.item.name}]之${before ? '前' : '后'}?`,
+            handler: function () {
+              this0.list.splice(before ? this0.index : this0.index + 1, 0, clone(draggingItem));
+              draggingFromList.splice(before ? draggingIndex + 1 : draggingIndex, 1);
+            }
+          }, {
+            title: '合并工具组?',
+            handler: function () {
+              mergeGroups();
+              draggingFromList.splice(before ? draggingIndex + 1 : draggingIndex, 1);
+            }
+          }];
+          notice('选择操作', draggingType === DragType.Group ? opts : [opts[0]]);
+        }
+        if (draggingType >= this.type) {
+          event.stopPropagation();
+        }
+      }
+    }
+  };
+
+  let list = {
+    name: 'list',
+    props: {
+      list: {},
+    },
+    template: '#list',
+    watch: {
+      list: {
+        handler(list) {
+          if (!list) {
+            return;
+          }
+          for (let i = 0; i < list.length; i++) {
+            let item = list[i];
+            if (item.name === ToDelete || item.groups && item.groups.length === 0) {
+              list.splice(i, 1);
+            }
+          }
+        },
+        deep: true
+      }
+    }
+  };
+  let group = {
+    name: 'group',
+    props: {
+      group: {},
+      groups: []
+    },
+    data() {
+      return {
+        name: "",
+        url: "",
+      }
+    },
+    template: '#group',
+    components: {
+      draggable,
+      list,
+    },
+    methods: {
+      newGroup(previousGroup) {
+        let base = 138, max = 255 - base;
+        let time = new Date().getTime();
+        let r = time % max;
+        this.groups.splice(this.groups.indexOf(previousGroup) + 1, 0, {
+          name: "请输入标题",
+          custom: true,
+          background: r % 2 === 0 ? colors[Math.ceil(Math.random() * colors.length)]
+            : `rgb(${r + base} , ${Math.floor(Math.random() * max) + base} , ${Math.floor(Math.random() * max) + base})`,
+          tools: []
+        });
+      },
+      newTool(group) {
+        group.tools.push({name: this.name || '', url: this.url, custom: true})
+      },
+    }
+  };
   let colors = ['AliceBlue', 'AntiqueWhite', 'Aqua', 'Aquamarine', 'Azure', 'Beige', 'Bisque', 'BlanchedAlmond', 'BurlyWood', 'CadetBlue', 'Chartreuse', 'Coral', 'CornflowerBlue', 'Cornsilk', 'Cyan', 'DarkCyan', 'DarkGoldenRod', 'DarkGray', 'DarkKhaki', 'Darkorange', 'DarkSalmon', 'DarkSeaGreen', 'DarkTurquoise', 'DeepPink', 'DeepSkyBlue', 'Feldspar', 'FloralWhite', 'Fuchsia', 'Gainsboro', 'GhostWhite', 'Gold', 'GoldenRod', 'GreenYellow', 'HoneyDew', 'HotPink', 'IndianRed', 'Ivory', 'Khaki', 'Lavender', 'LavenderBlush', 'LawnGreen', 'LemonChiffon', 'LightBlue', 'LightCoral', 'LightCyan', 'LightGoldenRodYellow', 'LightGrey', 'LightGreen', 'LightPink', 'LightSalmon', 'LightSeaGreen', 'LightSkyBlue', 'LightSlateGray', 'LightSteelBlue', 'LightYellow', 'Lime', 'LimeGreen', 'Linen', 'Magenta', 'MediumAquaMarine', 'MediumOrchid', 'MediumPurple', 'MediumSeaGreen', 'MediumSpringGreen', 'MediumTurquoise', 'MediumVioletRed', 'MintCream', 'MistyRose', 'Moccasin', 'NavajoWhite', 'OldLace', 'Olive', 'OliveDrab', 'Orange', 'OrangeRed', 'Orchid', 'PaleGoldenRod', 'PaleGreen', 'PaleTurquoise', 'PaleVioletRed', 'PapayaWhip', 'PeachPuff', 'Peru', 'Pink', 'Plum', 'PowderBlue', 'Red', 'RosyBrown', 'Salmon', 'SandyBrown', 'SeaGreen', 'SeaShell', 'Silver', 'SkyBlue', 'SlateGray', 'Snow', 'SpringGreen', 'SteelBlue', 'Tan', 'Teal', 'Thistle', 'Tomato', 'Turquoise', 'Violet', 'VioletRed', 'Wheat', 'White', 'WhiteSmoke', 'Yellow', 'YellowGreen',];
   new Vue({
     el: '#app',
-    draggingGroup: null,
-    draggingItem: null,
+    components: {
+      group,
+      list,
+      draggable,
+    },
     data: {
       toolGroups: [{
-        title: "公众号-程序员阿诺",
+        name: "公众号-程序员阿诺",
         background: "pink",
         tools: [{
           url: "https://qjyoung.github.io/",
@@ -222,7 +444,7 @@
           {url: 'https://mp.weixin.qq.com/s/D0RA8dv3e0_oDTdiN8CK8w', name: '奇记｜生死荒原路，52天首次单人完整横穿大羌塘'},
           {url: '', name: ''},]
       }, {
-        title: "实用小工具",
+        name: "实用小工具",
         custom: true,
         background: "22e674",
         tools: [
@@ -259,7 +481,7 @@
         ]
       }],
       countdown: {
-        title: "倒计时",
+        name: "倒计时",
         background: "FFE56F",
         date: new Date(),
         lunar: new Lunar(new Date()),
@@ -278,16 +500,13 @@
         }]
       },
       holidays: [],
-      name: "程序员阿诺",
-      url: "https://qjyoung.github.io",
       date: "",
       desc: "",
-      version: "2",
       readme: `⭐工具板&倒计时列表⭐️
 
 此工具板可方便分类收纳工作中常用的在线工具或参考资料链接
 
-如下所示，不同色块代表了不同的工具组，每组可有若干子条目
+如下所示，不同色块代表了不同的工具组，每组可添加若干子项(网页链接)
 鼠标移动到不同区域即可唤出各自的操作按钮和输入框
 
 使用指南：
@@ -295,11 +514,11 @@
 ② 每组右上角❌按钮，可将该组删除，同时组内所有条目都将被移除
 ③ 每组的标题都可实时编辑，只需要移动光标到相应位置
 
-子条目操作：
-④ 按输入框提示，正确输入数据后回车或点击✅按钮即可新增子条目
-⑤ 每个子条目右侧同样有❌按钮，可将该条目删除
+子项操作：
+④ 按输入框提示，正确输入数据后回车或点击✅按钮即可新增子项
+⑤ 每个子项右侧同样有❌按钮，可将该条目删除
 
-⑥ 工具组及其子条目都可自由拖拽移动位置，子条目支持跨组移动
+⑥ 工具组及其子项均可自由拖拽变换位置，工具组可两两合并，子项可跨组移动
 
 ⑦ 倒计时列表同理，不可移动。在电脑上点击标题可获取倒计时列表截图
 
@@ -311,11 +530,13 @@
           `
     },
     mounted() {
+      this.handleVersion();
+
       let doc = this.toolGroups[0];
-      this.toolGroups = this.getFromLocal("toolGroups", this.toolGroups);
+      this.toolGroups = this.getFromLocal(StoreKey.ToolGroups, this.toolGroups);
       this.toolGroups[0] = doc;
 
-      this.countdown.tools = this.getFromLocal("countdown", this.countdown).tools.filter(item => {
+      this.countdown.tools = this.getFromLocal(StoreKey.Countdown, this.countdown).tools.filter(item => {
         return item.custom
       });
 
@@ -324,14 +545,28 @@
       this.updateTime();
       setInterval(this.updateTime, 1000);
 
-      setTimeout(() => {
-        let version = localStorage.getItem("version");
-        if (!version || version !== this.version) {
-          confirm(this.readme) && localStorage.setItem("version", this.version);
-        }
-      }, 133)
     },
     methods: {
+      handleVersion() {
+        let currentVersion = 3;
+
+        let lastVersion = -1;
+        let _version = localStorage.getItem(StoreKey.Version);
+        if (_version) {
+          lastVersion = parseInt(_version);
+        }
+        if (lastVersion < 3) { // replace title to name
+          let _groups = localStorage.getItem(StoreKey.ToolGroups);
+          localStorage.setItem(StoreKey.ToolGroups, _groups.replaceAll("\"title\"", "\"name\""));
+        }
+        localStorage.setItem(StoreKey.Version, currentVersion.toString())
+
+        setTimeout(() => {
+          if (this.readme !== localStorage.getItem(StoreKey.Readme)) {
+            confirm(this.readme) && localStorage.setItem(StoreKey.Readme, this.readme);
+          }
+        }, 177);
+      },
       getFromLocal(key, field) {
         let cache = JSON.parse(localStorage.getItem(key));
         if (cache != null) {
@@ -349,27 +584,10 @@
         this.reloadCountDown();
         this.countdown.today = today;
       },
-      newGroup(previousGroup) {
-        let base = 138, max = 255 - base;
-        let time = new Date().getTime();
-        let r = time % max;
-        this.toolGroups.splice(this.toolGroups.indexOf(previousGroup) + 1, 0, {
-          title: "请输入标题",
-          custom: true,
-          background: r % 2 === 0 ? colors[Math.ceil(Math.random() * colors.length)]
-            : `rgb(${r + base}
-          , ${Math.floor(Math.random() * max) + base}
-          , ${Math.floor(Math.random() * max) + base})`,
-          tools: []
-        });
-      },
-      newTool(group) {
-        group.tools.push({name: this.name || '', url: this.url, custom: true})
-      },
       newCountdown() {
         let isLunar = false;
         let year = 'xxxx', month = 'xx', day = '';
-        if (this.desc === undefined || this.desc.length === 0) {
+        if (!this.desc || this.desc.length === 0) {
           notice("请填写描述");
           return;
         }
@@ -543,7 +761,7 @@
           }
         }
         this.sortAndSetStyle(items, maxDiffWidth + 1, maxDescWidth + 1);
-        localStorage.setItem("countdown", JSON.stringify(this.countdown));
+        localStorage.setItem(StoreKey.Countdown, JSON.stringify(this.countdown));
       },
       findHolidays() {
         this.holidays = [];
@@ -615,39 +833,6 @@
         }
         this.sortAndSetStyle(this.holidays, '365天'.visualLength() + 1, '<strong>国庆节</strong>'.visualLength() + 1);
       },
-      dragging(group, item) {
-        this.draggingGroup = group;
-        this.draggingItem = item;
-      },
-      drop(targetGroup, targetItem) {
-        if (!this.draggingGroup.custom || !targetGroup.custom) {
-          return;
-        }
-
-        let fromData = this.toolGroups;
-        let targetData = this.toolGroups;
-        let promptName = targetGroup.title;
-        let target = targetGroup;
-        let draggingEle = this.draggingGroup;
-
-        if (this.draggingItem) {
-          fromData = this.draggingGroup.tools;
-          targetData = targetGroup.tools;
-          draggingEle = this.draggingItem;
-          promptName = targetItem.name;
-          target = targetItem;
-        }
-
-        let originIndex = targetData.indexOf(draggingEle);
-        let targetIndex = targetData.indexOf(target);
-        originIndex !== targetIndex
-        && confirm(`确定移动到[${promptName}]之${originIndex > targetIndex ? '前' : '后'}?`)
-        && fromData.splice(fromData.indexOf(draggingEle), 1)
-        && targetData.splice(originIndex >= 0 ? targetIndex : targetIndex + 1, 0, draggingEle);
-
-        this.draggingGroup = null;
-        this.draggingItem = null;
-      },
       find(consumer, year, findDays) {
         findDays = findDays || 386;
         let date = year ? new Date(year, 0, 1) : new Date();
@@ -685,7 +870,7 @@
     watch: {
       toolGroups: {
         handler(groups) {
-          localStorage.setItem("toolGroups", JSON.stringify(groups));
+          localStorage.setItem(StoreKey.ToolGroups, JSON.stringify(groups));
         },
         deep: true
       },
