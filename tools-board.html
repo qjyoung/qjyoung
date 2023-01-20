@@ -557,7 +557,7 @@
         }
         if (lastVersion < 3) { // replace title to name
           let _groups = localStorage.getItem(StoreKey.ToolGroups);
-          _groups?.localStorage.setItem(StoreKey.ToolGroups, _groups.replaceAll("\"title\"", "\"name\""));
+          _groups && localStorage.setItem(StoreKey.ToolGroups, _groups.replaceAll("\"title\"", "\"name\""));
         }
         localStorage.setItem(StoreKey.Version, currentVersion.toString())
 
