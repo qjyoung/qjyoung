@@ -11,30 +11,28 @@
     <script type="text/javascript">
       window.onload = function () {
         // 速度很快
-        let date = new Date();
-        let time = date.getTime();
+        let time = new Date().getTime();
         let month = 0;
         let html = '<p>';
-        let newWeek = true;
+        let newLine = true;
         for (let i = 0; i < 366; i++) {
           let theDate = new Date(time + 3600 * 24 * 1000 * i);
-          if (theDate.getMonth() > month || theDate.getDay() === 1) {
-            newWeek = true;
-            if (theDate.getMonth() > month) {
-              month = theDate.getMonth();
-            }
+          if (theDate.getMonth() !== month) {
+            newLine = true;
+            month = theDate.getMonth();
           }
-          if (newWeek) {
+          if (theDate.getDay() === 1) {
+            newLine = true;
+          }
+          if (newLine) {
             html += `</p><p style="height: 160px;border-left:2px solid #0da0ec;margin-left: ${((theDate.getDay() + 7 - 1) % 7) * 152}">`;
-            newWeek = false;
+            newLine = false;
           }
           html += `<span style="text-align:center;float: left;height:156px;width: 150px;border:2px solid #0da0ec;border-left: 0; "> ${getDate(theDate)} </span>`;
         }
         html += '</p>'
-        console.log(new Date().getTime() - time)
 
         document.getElementById("calender").innerHTML = html;
-        console.log(new Date().getTime() - time)
       };
     </script>
 </head>
